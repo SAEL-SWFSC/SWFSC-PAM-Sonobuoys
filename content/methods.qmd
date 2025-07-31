@@ -1,0 +1,77 @@
+---
+title: Methods
+editor: 
+  markdown: 
+    wrap: 72
+bibliography: references.bib
+---
+
+Detail sonobuoy methods here, provide links to info. Also include
+summaries/links to papers (thode, miller, navy project, ASCR info, etc)
+
+## Field Methods
+
+Sonobuoys are expendable drifting recorders housed in a compact cylinder
+for deployment from ships or airplanes. When the buoys are deployed, the
+hydrophone drops to a pre-determined depth and a float inflates at the
+surface. The multi-plexed signal containing the audio and DIFAR
+information is transmitted from an antenna embedded in the float; this
+signal can be received using a VHF receiver. Specialized receivers are
+required to obtain the full low-frequency audio, and specialized
+software is required to demultiplex the DIFAR signal. Field methods have
+evolved over the years from analog to digital formats, and a summary of
+current field methods (as of 2019) can be found in
+\[[\@rankin](https://repository.library.noaa.gov/view/noaa/20265)\]
+
+## Playback Experiment and Methods Development
+
+In 2016, SWFSC conducted a playback experiment for the purpose of
+estimating the precision and accuracy of bearing angle estimation. This
+was part of a larger Navy-funded project to investigate the potential
+for using sonobuoys as a tool to estimate cetacean density in offshore
+waters (\[Rankin et al.
+2017(https://github.com/SAEL-SWFSC/SWFSC-PAM-Sonobuoys/tree/main/supplement/Rankin_SBFinalReport_Rep2017.pdf)\]).
+This data has been useful for methods development on several projects,
+and this data is publicly available for future projects ([Link to NCEI
+Data Portal](https://doi.org/10.25921/s2dw-2h15)).
+
+### Acoustic Spatial Capture Recapture
+
+![](images/Stevenson_ascr_2017.jpg){width="309"}
+
+SWFSC collaborated with [Ben Stevenson (University of
+Aukland)](https://profiles.auckland.ac.nz/ben-stevenson/about) to
+evaluate the potential use of Acoustic Spatial Capture Recapture (ASCR)
+methods to estimate call density across clustered sonobuoys. While a
+simulation suggested these methods should be feasible, application to
+real data identified a number of complications and errors that precluded
+adoption of ASCR for these cases. Links to summaries of the [sonobuoy
+SCR
+models](https://github.com/SAEL-SWFSC/SWFSC-PAM-Sonobuoys/tree/main/supplement/stevenson_SCRsonobuoys_summary2017.pdf)
+and [application to real
+data](https://github.com/SAEL-SWFSC/SWFSC-PAM-Sonobuoys/tree/main/supplement/stevenson_SCRcalcurceas_summary2017.pdf).
+
+#### Azigram Displays for DIFAR Sonobuoys
+
+![](images/ThodeAzigram_Figure3.jpeg){width="315"}
+
+As part of a larger methods paper led by [Aaron Thode (Scripps
+Institution of Oceanography)](https://athode.scrippsprofiles.ucsd.edu/),
+this playback data provided a means of testing the capabilities of using
+Azigrams to enhance the accuracy of bearing measurements of weak
+frequency-modulated signals. See [Thode et al.
+2019](https://pubs.aip.org/asa/jasa/article/146/1/95/997205) for more
+information.
+
+### Estimating Sonobuoy Drift
+
+![](images/Miller_drift_Fig1.jpeg){width="308"}
+
+We attached GPS to each of the four sonobuoys during the playback
+experiment, which provided high resolution tracking. This data provided
+a valuable dataset to test new methods for estimating sonobuoy drift
+developed by \[Brian Miller of the Australian Marine Mammal
+Center\](<https://www.marinemammals.gov.au/about/staff-and-students/brian-miller/>).
+See [Miller et al.
+2018](https://pubs.aip.org/asa/jasa/article/143/1/EL25/616424) for more
+information.

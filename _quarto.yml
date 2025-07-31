@@ -7,8 +7,8 @@ project:
 website: 
   page-navigation: true
   title: "NOAA quarto simple" 
-  site-url: "https://sael-swfsc.github.io/PAM_template_ResearchCompendium/" 
-  repo-url: "https://github.com/SAEL-SWFSC/PAM_template_ResearchCompendium"
+  site-url: "https://sael-swfsc.github.io/SWFSC-PAM-Sonobuoys/" 
+  repo-url: "https://github.com/SAEL-SWFSC/SWFSC-PAM-Sonobuoys"
   repo-actions: [edit, source, issue]
   favicon: images/favicon.ico
   
@@ -24,11 +24,11 @@ website:
     align: center
     tools: 
       - icon: globe
-        href: https://nmfs-ost.github.io/PAM_National_NMFS_Network
-        text: "NMFS National Passive Acoustic Monitoring Network"
+        href: https://sael-swfsc.github.io/SWFSC-PAM-Sonobuoys/
+        text: "SWFSC-PAM-Sonobuoys Website"
       - icon: github
-        href: https://github.com/SAEL-SWFSC/PAM_template_ResearchCompendium
-        text: "NMFS PAM SI Research Compendium Template"
+        href: https://github.com/SAEL-SWFSC/SWFSC-PAM-Sonobuoys
+        text: "SWFSC-PAM-Sonobuoys Repository"
 
     style: "docked"
     search: true
@@ -36,10 +36,16 @@ website:
     contents:
       - href: index.qmd
         text: Home
-      - href: content/folderStructure.qmd
-        text: "Folder Structure & Content"
-      - href: content/qmd_withCode.qmd
-        text: "Adding Executable Code"
+      - href: content/methods.qmd
+        text: "Methods"
+      - href: content/data.qmd
+        text: "Data"
+      - section: content/projects.qmd
+        text: Projects
+        contents:
+        - content/blue.qmd
+        - content/brydes.qmd
+        - content/sei.qmd     
 
 
         

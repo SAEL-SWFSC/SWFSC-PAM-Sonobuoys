@@ -82,5 +82,78 @@
     "title": "Adding Exectutable Code",
     "section": "Package Errors",
     "text": "Package Errors\nIf you are encountering errors in your GitHub actions which are not allowing you to publish your pages, you will need to change your workflow.\nOn your GitHub repository, click on the ‘Actions’ tab and look for failed workflows. You can click on the failed workflow to identify where the action failed. Below is an example fail-point where a required package cannot be found\n\n\nEdit Basic Workflow\nOne solution to this error is to include your additional packages in the basic render-and-publish.yml workflow.\n\nOpen your render-and-publish.yml workflow file\nIdentify the following lines (should be around line 17 & 18)\n  - name: Install packages (needed for Rmd)\n    run: Rscript -e 'install.packages(c(\"rmarkdown\", \"knitr\", \"jsonlite\"))'\nAdd packages to the list on the second line\n\nExample:\n    run: Rscript -e 'install.packages(c(\"rmarkdown\", \"knitr\", \"jsonlite\", \"dplyr\"))'\n\nCommit the changes and your workflow should re-run without errors\n\n\n\nUsing renv Workflow\nIf you are still encountering package errors you may need to set up a renv workflow in your R project. This will manage the package dependencies and ensure the proper packages are installed and loaded for rendered GitHub pages.\n\nMake sure you have an R project open for your repository and initialize renv in the project by running the following code renv::init() (you may need to install the renv package). This will create a locale renv folder and a renv.lock file with the packages you loaded\nInstall and load any additional packages, every time you add a new package you will need to add them to your project’s renv.lock file by running the following code renv::snapshot()\nUse .github/workflows/render-and-publish-with-code.yml as your GitHub pages actions workflow\n\nFrom your repository, rename .github/workflows/render-and-publish.yml to `render-and-publish.yml.disabled`\nFrom your repository, open .github/workflows/render-and-publish-with-code.yml\nUncomment lines 4-6, save and close workflow\n\nSave and push all changes to GitHub, make sure the new renv files are pushed. render-and-publish-with-code.yml should be the only workflow to run when changes are made to the repository"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Home",
+    "section": "",
+    "text": "Sonobuoys are expendable recorders used to detect and track underwater sounds. Originally designed to detect submarines, surplus sonobuoys have been provided by the Navy to NOAA scientists for studying low-frequency whale sounds.",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "content/sei.html",
+    "href": "content/sei.html",
+    "title": "sei_hawaii",
+    "section": "",
+    "text": "Detail sei whale hawaii data",
+    "crumbs": [
+      "Projects",
+      "sei_hawaii"
+    ]
+  },
+  {
+    "objectID": "content/methods.html",
+    "href": "content/methods.html",
+    "title": "Methods",
+    "section": "",
+    "text": "Detail sonobuoy methods here, provide links to info. Also include summaries/links to papers (thode, miller, navy project, ASCR info, etc)",
+    "crumbs": [
+      "Methods"
+    ]
+  },
+  {
+    "objectID": "content/brydes.html",
+    "href": "content/brydes.html",
+    "title": "brydes",
+    "section": "",
+    "text": "detail brydes whale work",
+    "crumbs": [
+      "Projects",
+      "brydes"
+    ]
+  },
+  {
+    "objectID": "content/blue.html",
+    "href": "content/blue.html",
+    "title": "blue",
+    "section": "",
+    "text": "detail iwc blue whale work with links",
+    "crumbs": [
+      "Projects",
+      "blue"
+    ]
+  },
+  {
+    "objectID": "content/data.html",
+    "href": "content/data.html",
+    "title": "data",
+    "section": "",
+    "text": "Identify sonobuoy data and metadata here, with links to raw data, processed data, greenbooks, summaries, etc.",
+    "crumbs": [
+      "Data"
+    ]
+  },
+  {
+    "objectID": "content/projects.html",
+    "href": "content/projects.html",
+    "title": "projects",
+    "section": "",
+    "text": "Identify projects here with links to pages, reports, etc.",
+    "crumbs": [
+      "Projects"
+    ]
   }
 ]
