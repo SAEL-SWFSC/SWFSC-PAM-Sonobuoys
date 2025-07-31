@@ -4,129 +4,9 @@
     "href": "index.html",
     "title": "Home",
     "section": "",
-    "text": "** This Template is available for use, but is also under construction and may be improved over time**",
+    "text": "Sonobuoys are expendable recorders used to detect and track underwater sounds. Originally designed to detect submarines, surplus sonobuoys have been provided by the Navy to NOAA scientists for studying low-frequency whale sounds.",
     "crumbs": [
       "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#what-is-a-research-compendium",
-    "href": "index.html#what-is-a-research-compendium",
-    "title": "Home",
-    "section": "What is a Research Compendium?",
-    "text": "What is a Research Compendium?\nA Research Compendium serves as both a ‘home’ for all the digital components of a research project as well as a means of managing, updating, and sharing this information. We want to create this collection so that reproducing the results is straightforward.\nBecause PAM data is naturally very large data– we do NOT want to save our raw acoustic data here. We do recommend that your research compendium provide information on accessing this raw data. This is valuable for others, and for Future You.\nThis research compendium is set up to create an HTML output (not necessarily a word doc or pdf).",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#how-to-use-this-template",
-    "href": "index.html#how-to-use-this-template",
-    "title": "Home",
-    "section": "How To Use This Template",
-    "text": "How To Use This Template\nThis template will create a Github Repository with the standard folders, a descriptive ReadMe that only requires slight modification, and the foundation for a Quarto website that can serve as a summary of your project. Follow the steps below to copy this template to your lab’s GitHub\n\nOpen this repository on GitHub\nClick on the ‘Use this template’ button in the top right, select ‘Create new repository’\n\nEdit repository settings\n\nSelect the ‘Include all branches’ option\nSelect your lab organization or yourself as the owner and set the repository name to your Project Name\nMake description “Research Compendium for Project Name”\nMake the repo public\n\n\nClick create repository\nTurn on GitHub pages under Settings-&gt;Pages. You will set pages to be made from the gh-pages branch and root directory\n\nUpdate ‘Actions’ settings\n\nUnder Settings -&gt; Actions -&gt; General -&gt; Actions permissions select ‘Allow all actions and reusable workflows’. Select save\n\nUnder Settings -&gt; Actions -&gt; General -&gt; Workflow permissions select ‘Read and write permissions’\n\n\n\n\n\n\n\nNote: Both of these settings may already be selected but you have to click save for both\n\n\n\n\n\n\n\nReturn to the main page of the repo to edit your website\n\nClick on ‘Code’ in the top left\nClick on the settings button next to the ‘About’ section on the right side of the repository\nSelect ‘Use your GitHub Pages website’. This should autopopulate the website\nSelect ‘Save Changes’\n\n\nThe foundation for your Research Compendium is now created! We recommend that you first modify the ReadMe to add your Project Name in the appropriate places.",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#example-github-research-compendiums",
-    "href": "index.html#example-github-research-compendiums",
-    "title": "Home",
-    "section": "Example Github Research Compendiums",
-    "text": "Example Github Research Compendiums\nHere are two lab manuals to pull inspiration from\n\nSWFSC Adrift in the California Current Project\nSWFSC BANTER for Beaked Whales",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "content/folderStructure.html",
-    "href": "content/folderStructure.html",
-    "title": "Folder Structure & Content",
-    "section": "",
-    "text": "This template provides a set of standard folders for specific types of files. We recommend following these standard approaches as consistency allows us to follow each other’s research workflow.\nHere we further explain how to work with this folder structure, with tips and tricks to make your work more accessible, reproducible, and to help Future You!",
-    "crumbs": [
-      "Folder Structure & Content"
-    ]
-  },
-  {
-    "objectID": "content/folderStructure.html#manuscript",
-    "href": "content/folderStructure.html#manuscript",
-    "title": "Folder Structure & Content",
-    "section": "📁 manuscript",
-    "text": "📁 manuscript\nManuscript for Report. This may contain one or more versions of the manuscript in one or more formats. This folder does not serve as the output location for rendered versions of the manuscript (those would be saved in the docs folder). Typically, this would be reserved for final manuscripts or manuscripts saved in an alternative format or manually modified (not direct rendered output).",
-    "crumbs": [
-      "Folder Structure & Content"
-    ]
-  },
-  {
-    "objectID": "content/folderStructure.html#content",
-    "href": "content/folderStructure.html#content",
-    "title": "Folder Structure & Content",
-    "section": "📁 content",
-    "text": "📁 content\nThis Research Compendium template is formatted for a HTML (website) output, and all chapters/sections for online report should reside in this content folder.",
-    "crumbs": [
-      "Folder Structure & Content"
-    ]
-  },
-  {
-    "objectID": "content/folderStructure.html#figs",
-    "href": "content/folderStructure.html#figs",
-    "title": "Folder Structure & Content",
-    "section": "📁 figs",
-    "text": "📁 figs\nContains all figures generated for the analysis. Your code to create figures should be saved in the code folder, and it should automatically save figure output directly to this figs folder. All figure names should be descriptive not based on the # of the figure (as this may change).",
-    "crumbs": [
-      "Folder Structure & Content"
-    ]
-  },
-  {
-    "objectID": "content/folderStructure.html#docs",
-    "href": "content/folderStructure.html#docs",
-    "title": "Folder Structure & Content",
-    "section": "📁 docs",
-    "text": "📁 docs\nContains rendered versions of the reports (if applicable). Note that this is different from the manuscript folder, which would have version(s) of the manuscript not rendered directly from the repository.\n\n\n\n\n\n\nNote: Need to check if this is relevant for this particular HTML output format",
-    "crumbs": [
-      "Folder Structure & Content"
-    ]
-  },
-  {
-    "objectID": "content/folderStructure.html#data",
-    "href": "content/folderStructure.html#data",
-    "title": "Folder Structure & Content",
-    "section": "📁 data",
-    "text": "📁 data\nContains ORIGINAL raw or raw-derived data. Github is NOT an appropriate platform for saving large files or large numbers of files. You will need to save your raw data (and possible other large data products) in an alternative location, such as NCEI, Figshare, or Zenodo. We recommend that you identify the location of all raw data (WHERE?). As this data is intended to be ORIGINAL data, we recommend that modified or intermediate data or data products (that are modified by code stored in the code folder) be stored in the output folder.\n\n\n\n\n\n\nNote: Where do we recommend that they identify the location of any data or data products not directly saved to this repository? In the readme? or the index file?",
-    "crumbs": [
-      "Folder Structure & Content"
-    ]
-  },
-  {
-    "objectID": "content/folderStructure.html#output",
-    "href": "content/folderStructure.html#output",
-    "title": "Folder Structure & Content",
-    "section": "📁 output",
-    "text": "📁 output\nThis can include any modified or intermediate data or data products (data in data folder is ORIGINAL), and data in output may be modified using code stored in code folder.",
-    "crumbs": [
-      "Folder Structure & Content"
-    ]
-  },
-  {
-    "objectID": "content/folderStructure.html#code",
-    "href": "content/folderStructure.html#code",
-    "title": "Folder Structure & Content",
-    "section": "📁 code",
-    "text": "📁 code\nScripts that actually do things. If using R, your script should use the here package rather than setwd() to build paths to files and allow for more efficient reproduction of workflow. Script should automatically access data in the data folder and save output to relevant folders (output, figs).\n\n_commonR.R\nWe recommend saving commonly used functions in the _commonR.R file (assuming you are using R for your analysis– if not, you can delete this file). This is a good place to identify the libraries to load, any themes or common formatting requirements, or other common functions. Ideally these types of functions are only located in one place, so that they only need to be changed in one place. You can then source this file in other code (reduces redundancy and allows you to modify these basic functions in one place instead of throughout your various scripts).",
-    "crumbs": [
-      "Folder Structure & Content"
-    ]
-  },
-  {
-    "objectID": "content/folderStructure.html#supplement",
-    "href": "content/folderStructure.html#supplement",
-    "title": "Folder Structure & Content",
-    "section": "📁 supplement",
-    "text": "📁 supplement\nSupplementary files that are not data, script, or components of the manuscript.",
-    "crumbs": [
-      "Folder Structure & Content"
     ]
   },
   {
@@ -134,19 +14,107 @@
     "href": "content/qmd_withCode.html",
     "title": "Adding Exectutable Code",
     "section": "",
-    "text": "You can add executable code chunks to your pages. See quarto Using R documentation for more information.",
-    "crumbs": [
-      "Adding Executable Code"
-    ]
+    "text": "You can add executable code chunks to your pages. See quarto Using R documentation for more information."
   },
   {
     "objectID": "content/qmd_withCode.html#package-errors",
     "href": "content/qmd_withCode.html#package-errors",
     "title": "Adding Exectutable Code",
     "section": "Package Errors",
-    "text": "Package Errors\nIf you are encountering errors in your GitHub actions which are not allowing you to publish your pages, you will need to change your workflow.\nOn your GitHub repository, click on the ‘Actions’ tab and look for failed workflows. You can click on the failed workflow to identify where the action failed. Below is an example fail-point where a required package cannot be found\n\n\nEdit Basic Workflow\nOne solution to this error is to include your additional packages in the basic render-and-publish.yml workflow.\n\nOpen your render-and-publish.yml workflow file\nIdentify the following lines (should be around line 17 & 18)\n  - name: Install packages (needed for Rmd)\n    run: Rscript -e 'install.packages(c(\"rmarkdown\", \"knitr\", \"jsonlite\"))'\nAdd packages to the list on the second line\n\nExample:\n    run: Rscript -e 'install.packages(c(\"rmarkdown\", \"knitr\", \"jsonlite\", \"dplyr\"))'\n\nCommit the changes and your workflow should re-run without errors\n\n\n\nUsing renv Workflow\nIf you are still encountering package errors you may need to set up a renv workflow in your R project. This will manage the package dependencies and ensure the proper packages are installed and loaded for rendered GitHub pages.\n\nMake sure you have an R project open for your repository and initialize renv in the project by running the following code renv::init() (you may need to install the renv package). This will create a locale renv folder and a renv.lock file with the packages you loaded\nInstall and load any additional packages, every time you add a new package you will need to add them to your project’s renv.lock file by running the following code renv::snapshot()\nUse .github/workflows/render-and-publish-with-code.yml as your default GitHub pages actions workflow\n\nFrom your repository, rename .github/workflows/render-and-publish.yml to render-and-publish.yml.disabled. Save file\nFrom your repository, rename .github/workflows/render-and-publish-with-code.yml.disabled to render-and-publish-with-code.yml. Save file\nSave and push all changes to GitHub, make sure the new renv files are pushed. render-and-publish-with-code.yml should be the only workflow to run when changes are made to the repository",
+    "text": "Package Errors\nIf you are encountering errors in your GitHub actions which are not allowing you to publish your pages, you will need to change your workflow.\nOn your GitHub repository, click on the ‘Actions’ tab and look for failed workflows. You can click on the failed workflow to identify where the action failed. Below is an example fail-point where a required package cannot be found\n\n\nEdit Basic Workflow\nOne solution to this error is to include your additional packages in the basic render-and-publish.yml workflow.\n\nOpen your render-and-publish.yml workflow file\nIdentify the following lines (should be around line 17 & 18)\n  - name: Install packages (needed for Rmd)\n    run: Rscript -e 'install.packages(c(\"rmarkdown\", \"knitr\", \"jsonlite\"))'\nAdd packages to the list on the second line\n\nExample:\n    run: Rscript -e 'install.packages(c(\"rmarkdown\", \"knitr\", \"jsonlite\", \"dplyr\"))'\n\nCommit the changes and your workflow should re-run without errors\n\n\n\nUsing renv Workflow\nIf you are still encountering package errors you may need to set up a renv workflow in your R project. This will manage the package dependencies and ensure the proper packages are installed and loaded for rendered GitHub pages.\n\nMake sure you have an R project open for your repository and initialize renv in the project by running the following code renv::init() (you may need to install the renv package). This will create a locale renv folder and a renv.lock file with the packages you loaded\nInstall and load any additional packages, every time you add a new package you will need to add them to your project’s renv.lock file by running the following code renv::snapshot()\nUse .github/workflows/render-and-publish-with-code.yml as your default GitHub pages actions workflow\n\nFrom your repository, rename .github/workflows/render-and-publish.yml to render-and-publish.yml.disabled. Save file\nFrom your repository, rename .github/workflows/render-and-publish-with-code.yml.disabled to render-and-publish-with-code.yml. Save file\nSave and push all changes to GitHub, make sure the new renv files are pushed. render-and-publish-with-code.yml should be the only workflow to run when changes are made to the repository"
+  },
+  {
+    "objectID": "content/methods.html",
+    "href": "content/methods.html",
+    "title": "Methods",
+    "section": "",
+    "text": "Detail sonobuoy methods here, provide links to info. Also include summaries/links to papers (thode, miller, navy project, ASCR info, etc)",
     "crumbs": [
-      "Adding Executable Code"
+      "Methods"
+    ]
+  },
+  {
+    "objectID": "content/methods.html#field-methods",
+    "href": "content/methods.html#field-methods",
+    "title": "Methods",
+    "section": "Field Methods",
+    "text": "Field Methods\nSonobuoys are expendable drifting recorders housed in a compact cylinder for deployment from ships or airplanes. When the buoys are deployed, the hydrophone drops to a pre-determined depth and a float inflates at the surface. The multi-plexed signal containing the audio and DIFAR information is transmitted from an antenna embedded in the float; this signal can be received using a VHF receiver. Specialized receivers are required to obtain the full low-frequency audio, and specialized software is required to demultiplex the DIFAR signal. Field methods have evolved over the years from analog to digital formats, and a summary of current field methods (as of 2019) can be found in [@rankin]",
+    "crumbs": [
+      "Methods"
+    ]
+  },
+  {
+    "objectID": "content/methods.html#playback-experiment-and-methods-development",
+    "href": "content/methods.html#playback-experiment-and-methods-development",
+    "title": "Methods",
+    "section": "Playback Experiment and Methods Development",
+    "text": "Playback Experiment and Methods Development\nIn 2016, SWFSC conducted a playback experiment for the purpose of estimating the precision and accuracy of bearing angle estimation. This was part of a larger Navy-funded project to investigate the potential for using sonobuoys as a tool to estimate cetacean density in offshore waters ([Rankin et al. 2017(https://github.com/SAEL-SWFSC/SWFSC-PAM-Sonobuoys/tree/main/supplement/Rankin_SBFinalReport_Rep2017.pdf)]). This data has been useful for methods development on several projects, and this data is publicly available for future projects (Link to NCEI Data Portal).\n\nAcoustic Spatial Capture Recapture\n\nSWFSC collaborated with Ben Stevenson (University of Aukland) to evaluate the potential use of Acoustic Spatial Capture Recapture (ASCR) methods to estimate call density across clustered sonobuoys. While a simulation suggested these methods should be feasible, application to real data identified a number of complications and errors that precluded adoption of ASCR for these cases. Links to summaries of the sonobuoy SCR models and application to real data.\n\nAzigram Displays for DIFAR Sonobuoys\n\nAs part of a larger methods paper led by Aaron Thode (Scripps Institution of Oceanography), this playback data provided a means of testing the capabilities of using Azigrams to enhance the accuracy of bearing measurements of weak frequency-modulated signals. See Thode et al. 2019 for more information.\n\n\n\nEstimating Sonobuoy Drift\n\nWe attached GPS to each of the four sonobuoys during the playback experiment, which provided high resolution tracking. This data provided a valuable dataset to test new methods for estimating sonobuoy drift developed by [Brian Miller of the Australian Marine Mammal Center](https://www.marinemammals.gov.au/about/staff-and-students/brian-miller/). See Miller et al. 2018 for more information.",
+    "crumbs": [
+      "Methods"
+    ]
+  },
+  {
+    "objectID": "content/brydes.html",
+    "href": "content/brydes.html",
+    "title": "Bryde’s Whale",
+    "section": "",
+    "text": "detail brydes whale work",
+    "crumbs": [
+      "Projects",
+      "Bryde's Whale"
+    ]
+  },
+  {
+    "objectID": "content/blue.html#etp-blue-whales",
+    "href": "content/blue.html#etp-blue-whales",
+    "title": "Blue Whale",
+    "section": "ETP Blue Whales",
+    "text": "ETP Blue Whales",
+    "crumbs": [
+      "Projects",
+      "Blue Whale"
+    ]
+  },
+  {
+    "objectID": "content/blue.html#antarctic-blue-whales",
+    "href": "content/blue.html#antarctic-blue-whales",
+    "title": "Blue Whale",
+    "section": "Antarctic Blue Whales",
+    "text": "Antarctic Blue Whales",
+    "crumbs": [
+      "Projects",
+      "Blue Whale"
+    ]
+  },
+  {
+    "objectID": "content/data.html",
+    "href": "content/data.html",
+    "title": "data",
+    "section": "",
+    "text": "Identify sonobuoy data and metadata here, with links to raw data, processed data, greenbooks, summaries, etc.",
+    "crumbs": [
+      "Data"
+    ]
+  },
+  {
+    "objectID": "content/projects.html",
+    "href": "content/projects.html",
+    "title": "projects",
+    "section": "",
+    "text": "Identify projects here with links to pages, reports, etc.",
+    "crumbs": [
+      "Projects"
+    ]
+  },
+  {
+    "objectID": "content/sei.html",
+    "href": "content/sei.html",
+    "title": "Sei Whale",
+    "section": "",
+    "text": "## Hawaii Sei Whales\n## CCE Sei Whales",
+    "crumbs": [
+      "Projects",
+      "Sei Whale"
     ]
   }
 ]

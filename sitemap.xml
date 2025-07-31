@@ -1,15 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://sael-swfsc.github.io/PAM_template_ResearchCompendium/index.html</loc>
-    <lastmod>2025-07-31T14:41:01.631Z</lastmod>
+    <loc>https://sael-swfsc.github.io/SWFSC-PAM-Sonobuoys/index.html</loc>
+    <lastmod>2025-07-31T21:21:45.855Z</lastmod>
   </url>
   <url>
-    <loc>https://sael-swfsc.github.io/PAM_template_ResearchCompendium/content/folderStructure.html</loc>
-    <lastmod>2025-07-31T14:41:01.622Z</lastmod>
+    <loc>https://sael-swfsc.github.io/SWFSC-PAM-Sonobuoys/content/qmd_withCode.html</loc>
+    <lastmod>2025-07-31T21:21:45.848Z</lastmod>
   </url>
   <url>
-    <loc>https://sael-swfsc.github.io/PAM_template_ResearchCompendium/content/qmd_withCode.html</loc>
-    <lastmod>2025-07-31T14:41:01.624Z</lastmod>
+    <loc>https://sael-swfsc.github.io/SWFSC-PAM-Sonobuoys/content/methods.html</loc>
+    <lastmod>2025-07-31T21:21:45.848Z</lastmod>
+  </url>
+  <url>
+    <loc>https://sael-swfsc.github.io/SWFSC-PAM-Sonobuoys/content/brydes.html</loc>
+    <lastmod>2025-07-31T21:21:45.846Z</lastmod>
+  </url>
+  <url>
+    <loc>https://sael-swfsc.github.io/SWFSC-PAM-Sonobuoys/content/blue.html</loc>
+    <lastmod>2025-07-31T21:21:45.845Z</lastmod>
+  </url>
+  <url>
+    <loc>https://sael-swfsc.github.io/SWFSC-PAM-Sonobuoys/content/data.html</loc>
+    <lastmod>2025-07-31T21:21:45.846Z</lastmod>
+  </url>
+  <url>
+    <loc>https://sael-swfsc.github.io/SWFSC-PAM-Sonobuoys/content/projects.html</loc>
+    <lastmod>2025-07-31T21:21:45.848Z</lastmod>
+  </url>
+  <url>
+    <loc>https://sael-swfsc.github.io/SWFSC-PAM-Sonobuoys/content/sei.html</loc>
+    <lastmod>2025-07-31T21:21:45.848Z</lastmod>
   </url>
 </urlset>
