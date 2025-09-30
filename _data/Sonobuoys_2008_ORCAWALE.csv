@@ -1,0 +1,193 @@
+"Cruise","Sonobuoy Number","Date","Latitude","Longitude","Sighting Number","Opportunistic Buoy?","Sonobuoy Type","Channel","Depth","Hours to Scuttle","Bad Buoys","Ship Noise?","Difar Signal?","Water Noise?","Biological Sounds?","Sounds Detected","DAT Tape Number","Additional Tapes?","Reception Distance (nmi)","Recording Reviewed?","Comments"
+1635,1,2008-08-01 13:29:00,47.412,-125.392,29,"Other","77",52,10,8,NA,1,1,1,0,NA,1,0,1,0,"may be bad"
+1635,2,2008-08-01 13:42:00,47.412,-125.392,29,"Other","77",52,10,8,1,1,1,1,0,NA,1,0,2,0,"Buoy dead at 13:48"
+1635,3,2008-08-01 13:52:00,47.4338,-125.411,29,"Other","77",60,10,8,2,1,1,1,0,NA,1,0,NA,0,"dead at 13:59; same tape as other 2 buoys (first time error)"
+1635,5,2008-08-02 10:16:10,-999,-999,30,"Other","77",52,10,8,1,1,1,1,0,NA,2,0,1,0,NA
+1635,6,2008-08-01 12:11:00,46.568,-128.041,30,"Other","77",60,10,8,2,1,1,1,0,NA,2,0,1,0,"12:15 :  Whales within 300m of SB
+12:16 : signal going bad may be a screamer
+12:19:  very faint
+12:23:  Tape is out"
+1635,9,2008-08-03 12:59:00,45.375,-130.07,37,"Other","77",60,10,8,1,1,1,1,0,NA,3,0,1,0,"Strong radio signal
+13:14 - In and out of reception
+13:18 - may be whale sounds, 300m from buoy
+13:19 - SB going dead
+13:30 - stop recording"
+1635,13,2008-08-04 10:26:00,-999,-999,41,"Other","77",62,10,8,2,1,1,1,0,NA,4,0,NA,0,"REC start at 10:33
+10:35 - aq
+10:37 - SB is 200m off port beam
+10:38 - signal going bad
+10:41 - radio signal strong, ac sig not great though
+10:47 - sb ahead at 150m"
+1635,15,2008-08-04 14:07:00,45.341,-130.2527,42,"Other","77",64,10,8,0,1,1,1,0,NA,5,0,NA,0,"May be a bit of a screamer, but can hear difar, ship and water, strong radio signal
+14:13 - whale at 500m in 6:00 position, going back to course and speed, will leave SB recording
+14:19- SB signal gone
+14:22 - Stop REC"
+1635,16,2008-08-06 07:34:00,46.608,-127.551,51,"Other","77",66,10,8,0,1,1,1,0,NA,6,0,NA,0,"7:35 - strong radio signal
+7:36 - whale was less than 200m off beam/stern
+7:38 - returning to base course and speed
+7:40 - signal in and out
+7:57 -stop REC"
+1635,17,2008-08-06 15:16:00,45.053,-128.121,58,"Other","77",68,10,8,0,1,1,1,0,NA,7,0,NA,0,"Blue Whale
+15:18 - 7 knots; 90L
+15:19 - 20R Buoy faint
+15:20 - High arch slow to 1/2 speed
+15:21 - Launching RHIB
+15:28 - Going to let record and prep more sb's
+15:29 - whale at port beam (flukes)"
+1635,18,2008-08-06 15:33:00,44.55,-127.31,58,"Other","77",64,10,8,0,1,1,1,0,NA,8,0,NA,0,"15:36 - signal in and out was good until now
+15:40 - faint
+15:52 - still rec animal is taking 20 min dives, this buoy is getting out of range, will prep another"
+1635,19,2008-08-06 16:02:00,44.874,-127.808,58,"Other","77",72,10,8,0,1,1,1,0,NA,9,0,NA,0,"16:03 - whale 300m off port bow
+16:03 - rec good so far
+16:35 - off chase still rec; reception still seems ok
+17:25:37 - STOP REC"
+1635,20,2008-08-08 15:15:00,43.851,-129.053,64,"Other","77",68,10,8,0,1,1,1,0,NA,10,0,NA,0,"Fin Whales
+15:19 - slowing to 3 knots for buoy
+15:22 - signal growing faint
+15:23 - Turn gain up to LP +6
+15:28 - Re-sight 150L at 200m
+15:33 - whale under boat
+15:33 - possible call seen (on array)"
+1635,21,2008-08-10 18:47:00,-999,-999,72,"Other","77",68,10,8,0,1,1,1,0,"Probable calls",11,0,1,0,"18:48 - REC
+18:49 - whales next to SB
+18:50 - possible vocal
+18:52 - whales up, ship heading 120L
+18:54 - whales 300m from buoy - vocals
+18:58 - decrease Low/mid filter to 240hz
+18:58 - possible vocals
+19:00 - At bow 200-300 m
+19:01 - 10R
+19:01:33 - whales dive
+19:02 - possible vocals
+19:03 - whales 200m from buoy
+19:08 - buoy signal dying
+19:12 - Stop REC
+18:54 -"
+1635,23,2008-08-10 19:33:00,42.646,-131.03,72,"Other","77",72,10,8,1,1,1,1,1,"likely",13,0,1,0,"19:33 - vocals
+19:36 - LF quiet
+19:37 - LF gaing at +12
+19:38 - vocals? Whale at 130 L of ship
+19:40 - obs off effort 19:46 - up to 350 hz on Lchannel; going to stay in area for buoy
+19:48 - 90R up to 3/4 speed whale at 100m
+19:51 - 10 L 300m
+19:51:55 - 0.48 nmi from sb drop
+1952 - 1/2 speed
+19:53 - 10R
+19:56 whale at 130L 200m20:00 - 20 L and maintain speed
+20:01 - whale up at 100L 300m, coming toward us, signal growing faint
+20:05 - change to sb 22 we are in range
+20:06 - back to sb23
+20:08 sb 23 on ch1 and 22 on ch2, both poor quality now
+20:09 - both ch on sb22, sb23 out of range
+20:10 - 0.94 nmi from sb 23
+20:13 - possible call"
+1635,22,2008-08-10 19:16:00,42.684,-131.044,72,"Other","77",62,10,8,0,1,1,1,0,NA,12,0,NA,0,"19:17 possible vocals
+19:19 - quiet whale at strar beam ~500m
+19:28 - Stop REC"
+1635,24,2008-08-11 08:09:00,42.465,-130.78,73,"Other","77",68,10,8,0,1,1,1,0,NA,14,0,NA,0,"not great signal
+8:12 - whale at 69L and 12 ret
+823 - End"
+1635,25,2008-08-11 08:24:00,42.4716,-130.7566,73,"Other","77",74,10,8,1,1,1,1,0,NA,15,0,1,0,"8:26 - lp at 240hz
+8:29 - lp at 350hz
+8:44 - animal at surface ahead of ship, sb sounds good, prepping more
+8:50 - sb out of range"
+1635,27,2008-08-12 08:27:00,42.1283,-129.1383,77,"Other","77",78,10,8,1,1,1,1,1,"sei",17,0,1,0,"FIN and SEI
+8:28 - vocals
+- I went on small boat deployment after this and left recording"
+1635,28,2008-08-13 08:30:00,41.1216,-128.365,84,"Other","77",74,10,8,0,1,1,1,1,NA,18,0,NA,0,"LP at 240hz
+8:33 - gaing was +12 now at +6
+8:34 - 90L
+8:35 - 350 hz and +12
+8:37 - possible calls
+8:38 - Mid/high filter at 3.5"
+1635,30,2008-08-13 16:54:00,40.745,-129.42,85,"Other","77",76,10,8,1,1,1,1,1,"possible sei",19,0,NA,0,"Whale less than 100m from buoy, possible call at very beginning of rec
+16:57 - Turning
+17:04 - losing reception
+17:10 - getting radio signal again
+17:26 end"
+1635,32,2008-08-13 17:47:00,40.74,-129.4216,85,"Other","77",76,10,8,2,1,1,1,1,"sei?",20,0,NA,0,"not sure channel # is correct
+17:48 - +8 - +12 gain LF
+17:49 - possible pulse calls
+17:51 - switch channels on ch2
+18:03 - signal gone
+18:17 - back to course and speed"
+1635,35,2008-08-14 15:11:00,41.0833,-130.04,89,"Other","77",64,10,8,2,1,1,1,1,"Probable",21,0,NA,0,"15:14 - 10R at full speed
+15:16 - animal dove coming to slow speed, possible vocals shortly after this
+15:40 - reception fading
+15:41 - biologics?
+15:42 - animals are along side us, maintaining course and speed"
+1635,37,2008-08-16 13:03:36,43.6558,-128.9314,93,"Other","77",64,10,8,1,1,1,1,1,"Fin",22,0,1,0,"FIN
+19:06 - Calls
+19:15 - Approaching SB to pick up a biopsy
+19:23 - whales less than 100m from SB
+19:25 - LP to 240 hz (was 350)
+19:39 - rec still seems good whales still near buoy
+19:49 - within 100m of sb, seems like multiple vocal animals
+19:52 - SB on star beam
+19:58 - rubbing noise
+20:00 going bad may throw another sb"
+1635,45,2008-09-05 13:38:00,36.5618,-123.5953,177,"Other","77",78,8,8,2,1,1,1,1,NA,23,0,1,0,"13:43 - animals off array at 300m
+13:48 - LP at 350 now; was 240
+13:49 - buoy may be dying, will keep recording
+13:50:45 - stop recording"
+1635,49,2008-09-05 14:46:00,36.5433,-123.6794,177,"Other","77",68,8,8,2,1,1,1,1,"fin pulse",24,0,NA,0,"14:47 - ANIMAL OFF STAR BEAM AT 500M
+lp AT 350HZ
+14:51 - sb may be failing"
+1635,50,2008-09-07 07:54:00,39.7312,-123.9517,187,"Other","77",78,8,8,0,1,1,1,1,"blue whale calls",25,0,1,0,"7:54 - calls right away
+7:59 - animals 100-200 m off port beam, good calls
+8:10 - getting out of range, still calls though
+8:20 - out of range, end rec, 1.8nmi away from buoy currently"
+1635,51,2008-09-20 13:45:02,41.4707,-125.6312,294,"Other","77",78,8,8,0,1,1,1,0,NA,27,0,NA,0,"1421: recording started SB working
+1435: can hear M22; signal sometimes in and out a bit
+1455: biologic?
+15:42 end bc over 1 mi away"
+1635,52,2008-09-21 13:25:00,40.6919,-127.0907,313,"Other","77",72,8,8,0,1,1,1,1,NA,28,0,2,0,"1321: recording, calls on array at 13:19, maybe a few at start on sonobouy also.
+1359: SB abeam starboard 300-400m"
+1635,53,2008-09-21 17:16:36,40.2541,-127.1958,322,"Other","77",78,8,8,0,1,1,1,1,NA,29,0,1,0,"17:16 START, MAY BE CALLS RIGHT AWAY
+17:29 - SB GOING OUT SOME
+17:32 - CS, WILL LEAVE REC
+1750 -END"
+1635,54,2008-09-21 18:39:00,40.2716,-127.3276,324,"Other","77",72,8,8,0,1,1,1,1,NA,30,0,NA,0,"BLUE AND FIN
+1842-BIOLOGICS
+1929-BOX AROUND SB 
+1959 PULL IN ARRAY"
+1635,55,2008-09-29 09:27:00,37.207,-125.9073,384,"Other","77",78,8,8,0,1,1,1,1,"Fin pulses",31,0,1,0,"SB working, heard LF pulses right away
+Dolphins (delphinus) in the area
+10:03 - LF pulsing on SB; ec on ish 
+10:09 - SB signal fading, but we are turning 150L and heading back toward it, animals right by buoy drop
+10:13 - we are 0.7nmi from SB drop, strong current though
+10:19 - CS; sb still working
+10:24- losing range
+~10:30 end recording"
+1635,56,2008-09-29 11:28:00,37.1545,-126.0795,388,"Other","77",76,8,8,0,1,1,1,1,"fin",32,0,2,0,"animals 50m away at drop,
+11:32 pulsing on SB? Might have been turning also
+11:33 ship noise gone on SB
+11:35 pulses?
+11:37 animal off port beam 100 m
+11:39 SB signal fading ~0.9nmi from drop"
+1635,57,2008-09-29 11:54:00,37.1759,-126.1114,388,"Other","77",78,8,8,0,1,1,1,0,NA,33,0,NA,0,"review recording, not sure if biological sounds on it"
+1635,64,2008-09-29 13:16:00,37.2101,-126.1338,389,"Other","77",72,8,8,6,1,1,1,1,"fin",34,0,2,0,NA
+1635,66,2008-10-01 12:10:00,34.3274,-127.0093,405,"Other","77",74,8,8,1,1,1,1,1,"Blue whale",35,0,1,0,"not monitored the whole time, some bule whale vocals at beginning, animal was moving away relatively quickly when seen between dives"
+1635,67,2008-10-03 11:28:00,35.1169,-123.6758,427,"Other","77",78,8,8,0,1,1,1,0,NA,36,0,NA,0,"Fin whale, not monitoring closely
+1142 - LF calls on array"
+1635,68,2008-10-04 09:43:00,34.7114,-121.9224,435,"Other","77",78,8,8,0,1,1,1,1,"fin calls",37,0,1,0,"952 - possible pulse calls, calls on array, during turn
+1002- calls on array
+1024 - end"
+1635,69,2008-10-04 10:24:00,34.731,-121.9218,435,"Other","77",74,8,8,0,1,1,1,1,"Fin calls",38,0,NA,0,"possible calls right away
+10:26 - animals 300m off stern, by array and SB
+10:36 - SB at 70R and 300m, whales at 300m right off bow
+11:00 - SB nearly out of range"
+1635,70,2008-10-07 11:04:00,33.3019,-119.1702,487,"Other","77",74,8,8,0,1,1,1,1,NA,39,0,2,0,"not monitored, may have heard fin calls right away"
+1635,72,2008-10-16 13:33:00,32.8442,-120.704,72,"Other","77",78,8,8,0,1,1,1,0,NA,41,0,1,0,"periodic sb 'screaming', not monitored closely, possible calls
+13:40 - losing signal"
+1635,73,2008-10-27 14:09:00,33.7676,-124.4034,673,"Other","77",78,8,8,0,1,1,1,1,"Fin",42,0,1,0,"Cruise ship behind us
+14:14 - Fin pulses
+14:16 - ship at 65L and 1 ret
+14:22 - pulses
+14:27 - star turn then we will resume cs
+14:42 - end rec"
+1635,74,2008-11-12 14:03:14,33.1574,-126.1438,737,"Other","77B",78,NA,8,0,1,1,1,0,NA,43,0,NA,0,"SHALLOW, C2"
+1635,75,2008-11-12 13:38:48,33.1484,-126.1582,737,"Other","77B",74,NA,8,1,1,1,1,0,NA,43,0,NA,0,"SHALLOW, C2"
+1635,76,2008-11-19 12:20:28,30.3617,-123.1348,773,"Other","77b",76,NA,8,1,1,1,1,0,NA,44,0,NA,0,"shallow, C2"
+1635,77,2008-11-27 07:21:04,33.0093,-122.859,799,"Other","53D",72,90,2,0,1,1,1,0,NA,45,0,NA,0,NA
+1635,78,2008-11-27 13:10:00,32.6306,-122.9664,810,"Other","53D",72,90,1,3,1,1,1,0,NA,46,0,NA,0,NA

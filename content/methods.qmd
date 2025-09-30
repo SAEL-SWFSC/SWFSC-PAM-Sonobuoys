@@ -19,9 +19,33 @@ information is transmitted from an antenna embedded in the float; this
 signal can be received using a VHF receiver. Specialized receivers are
 required to obtain the full low-frequency audio, and specialized
 software is required to demultiplex the DIFAR signal. Field methods have
-evolved over the years from analog to digital formats, and a summary of
-current field methods (as of 2019) can be found in
-\[[\@rankin](https://repository.library.noaa.gov/view/noaa/20265)\]
+evolved over the years from analog to digital formats (sonobuoy
+guidelines for select years can be found in the repository [supplement
+folder](https://github.com/SAEL-SWFSC/SWFSC-PAM-Sonobuoys/tree/main/supplement)),
+and [Rankin et al.
+(2019)](https://repository.library.noaa.gov/view/noaa/20265) provides
+detailed information on using sonobuoys for ceteacean surveys based on
+decades of research.
+
+## Analysis Methods
+
+Most sonobuoys were monitored in real-time by field researchers, and
+field notes can be found in the [fieldNotes
+folder](https://github.com/SAEL-SWFSC/SWFSC-PAM-Sonobuoys/tree/main/supplement/fieldNotes)
+in the SWFSC-PAM-Sonobuoy github repository.
+
+Select sonobuoy deployments were analyzed for publications, where
+specific methods are outlined in each publication (see
+[publications](https://sael-swfsc.github.io/SWFSC-PAM-Sonobuoys/content/publications.html))
+
+A standardized review of select sonobuoy is ongoing, as time allows.
+Analog sonobuoy recordings were digitized by playing back analog
+recordings through a Soundblaster Extigy sound card to a computer using
+RavenPro (48kHz sample rate, 16-bit, 10 min file size). Not all analog
+recordings were digitized; a list of digitized recordings can be found
+here(LINK). Digitized recordings (wav files) are reviewed in RavenPro.
+Recordings are scanned twice to better monitor at mid- and
+low-frequencies.
 
 ## Playback Experiment and Methods Development
 
@@ -29,8 +53,8 @@ In 2016, SWFSC conducted a playback experiment for the purpose of
 estimating the precision and accuracy of bearing angle estimation. This
 was part of a larger Navy-funded project to investigate the potential
 for using sonobuoys as a tool to estimate cetacean density in offshore
-waters (\[Rankin et al.
-2017(https://github.com/SAEL-SWFSC/SWFSC-PAM-Sonobuoys/tree/main/supplement/Rankin_SBFinalReport_Rep2017.pdf)\]).
+waters ([Rankin et al.
+2017](https://github.com/SAEL-SWFSC/SWFSC-PAM-Sonobuoys/tree/main/supplement/Rankin_SBFinalReport_Rep2017.pdf)).
 This data has been useful for methods development on several projects,
 and this data is publicly available for future projects ([Link to NCEI
 Data Portal](https://doi.org/10.25921/s2dw-2h15)).
@@ -70,8 +94,8 @@ information.
 We attached GPS to each of the four sonobuoys during the playback
 experiment, which provided high resolution tracking. This data provided
 a valuable dataset to test new methods for estimating sonobuoy drift
-developed by \[Brian Miller of the Australian Marine Mammal
-Center\](<https://www.marinemammals.gov.au/about/staff-and-students/brian-miller/>).
+developed by [Brian Miller of the Australian Marine Mammal
+Center](https://www.marinemammals.gov.au/about/staff-and-students/brian-miller/).
 See [Miller et al.
 2018](https://pubs.aip.org/asa/jasa/article/143/1/EL25/616424) for more
 information.

@@ -2,6 +2,7 @@
 title: "Home"
 subtitle: "SWFSC-PAM Sonobuoy Research"
 page-layout: full
+link-external-newwindow: true
 ---
 
 Sonobuoys are expendable recorders used to detect and track underwater sounds. Originally designed to detect submarines, surplus sonobuoys have been provided by the Navy to NOAA scientists for studying low-frequency whale sounds.

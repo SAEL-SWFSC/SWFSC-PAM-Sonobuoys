@@ -46,7 +46,8 @@ website:
         - content/blue.qmd
         - content/brydes.qmd
         - content/sei.qmd     
-
+      - href: content/publications.qmd
+        text: "Publications"
 
         
 format:
@@ -57,6 +58,7 @@ format:
     code-copy: true
     code-overflow: wrap
     toc: true
+    link-external-newwindow: true
 
 
 filters:

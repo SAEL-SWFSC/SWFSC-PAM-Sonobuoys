@@ -1,0 +1,86 @@
+{
+  "values": [
+    {
+      "key": "1",
+      "column": "Start_End",
+      "value": "start"
+    },
+    {
+      "key": "3",
+      "column": "Start_End",
+      "value": "end"
+    },
+    {
+      "key": "1",
+      "column": "Detection",
+      "value": "noise"
+    },
+    {
+      "key": "3",
+      "column": "Detection",
+      "value": "blue"
+    },
+    {
+      "key": "4",
+      "column": "Detection",
+      "value": "brydes"
+    },
+    {
+      "key": "5",
+      "column": "Detection",
+      "value": "humpback"
+    },
+    {
+      "key": "6",
+      "column": "Detection",
+      "value": "fin"
+    },
+    {
+      "key": "2",
+      "column": "Detection",
+      "value": "unknown"
+    },
+    {
+      "key": "7",
+      "column": "Detection",
+      "value": "minke"
+    },
+    {
+      "key": "8",
+      "column": "Detection",
+      "value": "CHECK"
+    },
+    {
+      "key": "1",
+      "column": "Quality",
+      "value": "low"
+    },
+    {
+      "key": "2",
+      "column": "Quality",
+      "value": "med"
+    },
+    {
+      "key": "3",
+      "column": "Quality",
+      "value": "high"
+    },
+    {
+      "key": "9",
+      "column": "Start_End",
+      "value": "NA"
+    },
+    {
+      "key": "9",
+      "column": "Detection",
+      "value": "NA"
+    },
+    {
+      "key": "9",
+      "column": "Quality",
+      "value": "NA"
+    }
+  ],
+  "presetType": "SELECTION_REVIEW_ANNOTATION_KEYMAP",
+  "className": "edu.cornell.ornith.raven.preset.AnnotationKeymapPreset"
+}

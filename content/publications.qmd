@@ -1,0 +1,29 @@
+---
+title: "publications"
+format: html
+---
+
+## Publications based on SWFSC Sonobuoy Recordings and Playback Studies
+
+Jones, B., Rankin, S., & Archer, E. (2011). Fin whale acoustics as a tool to assess stock structure in the North Pacific. U.S. Department of Commerce, National Marine Fisheries Service Technical Memorandum NOAA-TM-NMFS-SWFSC-485. 23 pp.
+ [PDF](https://repository.library.noaa.gov/view/noaa/4509)
+
+Miller, B. S., Wotherspoon, S., Rankin, S., Calderan, S., Leaper, R., & Keating, J. L. (2018). Estimating drift of directional sonobuoys from acoustic bearings. The Journal of the Acoustical Society of America, 143(1), EL25-EL30. [doi.org/10.1121/1.5020621](https://doi.org/10.1121/1.5020621)
+
+Oleson, E. M., Barlow, J., Gordon, J., Rankin, S., & Hildebrand, J. A. (2003). LOW FREQUENCY CALLS OF BRYDE'S WHALES. Marine Mammal Science, 19(2), 407-419. [doi.org/10.1111/j.1748-7692.2003.tb01119.x](https://doi.org/10.1111/j.1748-7692.2003.tb01119.x)
+
+Ou, H., Au, W. W., Van Parijs, S., Oleson, E. M., & Rankin, S. (2015). Discrimination of frequency-modulated Baleen whale downsweep calls with overlapping frequencies. The Journal of the Acoustical Society of America, 137(6), 3024-3032.[//doi.org/10.1121/1.4919304](https://doi.org/10.1121/1.4919304)
+
+Rankin, S. (2008). Acoustic studies of marine mammals during seven years of combined visual and acoustic line-transect surveys for cetaceans in the eastern and central Pacific Ocean. U.S. Department of Commerce, National Marine Fisheries Service Technical Memorandum NOAA-TM-NMFS-SWFSC-429. 58 pp. [PDF](https://repository.library.noaa.gov/view/noaa/3608)
+
+Rankin, S., & Barlow, J. (2007). Vocalizations of the sei whale Balaenoptera borealis off the Hawaiian Islands. Bioacoustics, 16(2), 137-145. [PDF](https://www.academia.edu/download/45586694/rankin.barlow_sei.vocals_bioac07.pdf)
+
+Rankin, S., Barlow, J., & Stafford, K. M. (2006). Blue whale (Balaenoptera musculus) sightings and recordings south of the Aleutian Islands. Marine Mammal Science, 22(3), 708-713. [doi.org/10.1111/j.1748-7692.2006.00054.x](https://doi.org/10.1111/j.1748-7692.2006.00054.x)
+
+Rankin, S., Miller, B., Crance, J. L., Sakai, T., & Keating, J. L. (2019). Sonobuoy acoustic data collection during cetacean surveys. U.S. Department of Commerce, National Marine Fisheries Service Technical Memorandum NOAA-TM-NMFS-SWFSC-614. 36 pp. [PDF](https://repository.library.noaa.gov/view/noaa/20265)
+
+Thode, A. M., Sakai, T., Michalec, J., Rankin, S., Soldevilla, M. S., Martin, B., & Kim, K. H. (2019). Displaying bioacoustic directional information from sonobuoys using “azigrams”. The Journal of the Acoustical Society of America, 146(1), 95-102. [doi.org/10.1121/1.511481](https://doi.org/10.1121/1.5114810)
+
+Wade, P.R., De Robertis, A., Hough, K.R., Booth, R., Kennedy, A., LeDuc, R.G., Munger, L., Napp, J., Shelden, K.E.W., Rankin, S. and Vasquez, O. (2011). Rare detections of North Pacific right whales in the Gulf of Alaska, with observations of their potential prey. Endangered Species Research, 13(2), 99-109.[doi.org/10.3354/esr00324](https://doi.org/10.3354/esr00324)
+
+Wade, P., Heide-Jørgensen, M.P., Shelden, K., Barlow, J., Carretta, J., Durban, J., LeDuc, R., Munger, L., Rankin, S., Sauter, A. and Stinchcomb, C. (2006). Acoustic detection and satellite-tracking leads to discovery of rare concentration of endangered North Pacific right whales. Biology letters, 2(3), 417-419. [doi.org/10.1098/rsbl.2006.0460](https://doi.org/10.1098/rsbl.2006.0460)
