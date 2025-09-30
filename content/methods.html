@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.32">
+<meta name="generator" content="quarto-1.8.25">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -34,18 +34,19 @@ ul.task-list li input[type="checkbox"] {
 <link href="../images/favicon.ico" rel="icon">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-2fef5ea3f8957b3e4ecc936fc74692ca.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-707d8167ce6003fca903bfe2be84ab7f.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-9f8fe30c0596ce76f31474f68382ded0.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-5b77044b0eb18db3dd5d031f3c45cf95.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-9f8fe30c0596ce76f31474f68382ded0.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-3fe749c4c491919af384cf3d21cd6cd9.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-232e4682cfd531faa731a02c7ded2837.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-3fe749c4c491919af384cf3d21cd6cd9.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -263,7 +264,8 @@ ul.task-list li input[type="checkbox"] {
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
     <div class="pt-lg-2 mt-2 text-center sidebar-header">
       <a href="../index.html" class="sidebar-logo-link">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/7/79/NOAA_logo.svg" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/7/79/NOAA_logo.svg" alt="" class="sidebar-logo light-content py-0 d-lg-inline d-none">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/7/79/NOAA_logo.svg" alt="" class="sidebar-logo dark-content py-0 d-lg-inline d-none">
       </a>
       <div class="sidebar-tools-main tools-wide">
     <a href="https://sael-swfsc.github.io/SWFSC-PAM-Sonobuoys/" title="SWFSC-PAM-Sonobuoys Website" class="quarto-navigation-tool px-1" aria-label="SWFSC-PAM-Sonobuoys Website"><i class="bi bi-globe"></i></a>
@@ -325,6 +327,12 @@ ul.task-list li input[type="checkbox"] {
 </li>
       </ul>
   </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../content/publications.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Publications</span></a>
+  </div>
+</li>
     </ul>
     </div>
 </nav>
@@ -336,6 +344,7 @@ ul.task-list li input[type="checkbox"] {
    
   <ul>
   <li><a href="#field-methods" id="toc-field-methods" class="nav-link active" data-scroll-target="#field-methods">Field Methods</a></li>
+  <li><a href="#analysis-methods" id="toc-analysis-methods" class="nav-link" data-scroll-target="#analysis-methods">Analysis Methods</a></li>
   <li><a href="#playback-experiment-and-methods-development" id="toc-playback-experiment-and-methods-development" class="nav-link" data-scroll-target="#playback-experiment-and-methods-development">Playback Experiment and Methods Development</a>
   <ul class="collapse">
   <li><a href="#acoustic-spatial-capture-recapture" id="toc-acoustic-spatial-capture-recapture" class="nav-link" data-scroll-target="#acoustic-spatial-capture-recapture">Acoustic Spatial Capture Recapture</a></li>
@@ -370,11 +379,17 @@ ul.task-list li input[type="checkbox"] {
 <p>Detail sonobuoy methods here, provide links to info. Also include summaries/links to papers (thode, miller, navy project, ASCR info, etc)</p>
 <section id="field-methods" class="level2">
 <h2 class="anchored" data-anchor-id="field-methods">Field Methods</h2>
-<p>Sonobuoys are expendable drifting recorders housed in a compact cylinder for deployment from ships or airplanes. When the buoys are deployed, the hydrophone drops to a pre-determined depth and a float inflates at the surface. The multi-plexed signal containing the audio and DIFAR information is transmitted from an antenna embedded in the float; this signal can be received using a VHF receiver. Specialized receivers are required to obtain the full low-frequency audio, and specialized software is required to demultiplex the DIFAR signal. Field methods have evolved over the years from analog to digital formats, and a summary of current field methods (as of 2019) can be found in [<a href="https://repository.library.noaa.gov/view/noaa/20265">@rankin</a>]</p>
+<p>Sonobuoys are expendable drifting recorders housed in a compact cylinder for deployment from ships or airplanes. When the buoys are deployed, the hydrophone drops to a pre-determined depth and a float inflates at the surface. The multi-plexed signal containing the audio and DIFAR information is transmitted from an antenna embedded in the float; this signal can be received using a VHF receiver. Specialized receivers are required to obtain the full low-frequency audio, and specialized software is required to demultiplex the DIFAR signal. Field methods have evolved over the years from analog to digital formats (sonobuoy guidelines for select years can be found in the repository <a href="https://github.com/SAEL-SWFSC/SWFSC-PAM-Sonobuoys/tree/main/supplement">supplement folder</a>), and <a href="https://repository.library.noaa.gov/view/noaa/20265">Rankin et al. (2019)</a> provides detailed information on using sonobuoys for ceteacean surveys based on decades of research.</p>
+</section>
+<section id="analysis-methods" class="level2">
+<h2 class="anchored" data-anchor-id="analysis-methods">Analysis Methods</h2>
+<p>Most sonobuoys were monitored in real-time by field researchers, and field notes can be found in the <a href="https://github.com/SAEL-SWFSC/SWFSC-PAM-Sonobuoys/tree/main/supplement/fieldNotes">fieldNotes folder</a> in the SWFSC-PAM-Sonobuoy github repository.</p>
+<p>Select sonobuoy deployments were analyzed for publications, where specific methods are outlined in each publication (see <a href="https://sael-swfsc.github.io/SWFSC-PAM-Sonobuoys/content/publications.html">publications</a>)</p>
+<p>A standardized review of select sonobuoy is ongoing, as time allows. Analog sonobuoy recordings were digitized by playing back analog recordings through a Soundblaster Extigy sound card to a computer using RavenPro (48kHz sample rate, 16-bit, 10 min file size). Not all analog recordings were digitized; a list of digitized recordings can be found here(LINK). Digitized recordings (wav files) are reviewed in RavenPro. Recordings are scanned twice to better monitor at mid- and low-frequencies.</p>
 </section>
 <section id="playback-experiment-and-methods-development" class="level2">
 <h2 class="anchored" data-anchor-id="playback-experiment-and-methods-development">Playback Experiment and Methods Development</h2>
-<p>In 2016, SWFSC conducted a playback experiment for the purpose of estimating the precision and accuracy of bearing angle estimation. This was part of a larger Navy-funded project to investigate the potential for using sonobuoys as a tool to estimate cetacean density in offshore waters ([Rankin et al. 2017(https://github.com/SAEL-SWFSC/SWFSC-PAM-Sonobuoys/tree/main/supplement/Rankin_SBFinalReport_Rep2017.pdf)]). This data has been useful for methods development on several projects, and this data is publicly available for future projects (<a href="https://doi.org/10.25921/s2dw-2h15">Link to NCEI Data Portal</a>).</p>
+<p>In 2016, SWFSC conducted a playback experiment for the purpose of estimating the precision and accuracy of bearing angle estimation. This was part of a larger Navy-funded project to investigate the potential for using sonobuoys as a tool to estimate cetacean density in offshore waters (<a href="https://github.com/SAEL-SWFSC/SWFSC-PAM-Sonobuoys/tree/main/supplement/Rankin_SBFinalReport_Rep2017.pdf">Rankin et al. 2017</a>). This data has been useful for methods development on several projects, and this data is publicly available for future projects (<a href="https://doi.org/10.25921/s2dw-2h15">Link to NCEI Data Portal</a>).</p>
 <section id="acoustic-spatial-capture-recapture" class="level3">
 <h3 class="anchored" data-anchor-id="acoustic-spatial-capture-recapture">Acoustic Spatial Capture Recapture</h3>
 <p><img src="images/Stevenson_ascr_2017.jpg" class="img-fluid" width="309"></p>
@@ -388,7 +403,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="estimating-sonobuoy-drift" class="level3">
 <h3 class="anchored" data-anchor-id="estimating-sonobuoy-drift">Estimating Sonobuoy Drift</h3>
 <p><img src="images/Miller_drift_Fig1.jpeg" class="img-fluid" width="308"></p>
-<p>We attached GPS to each of the four sonobuoys during the playback experiment, which provided high resolution tracking. This data provided a valuable dataset to test new methods for estimating sonobuoy drift developed by [Brian Miller of the Australian Marine Mammal Center](<a href="https://www.marinemammals.gov.au/about/staff-and-students/brian-miller/" class="uri">https://www.marinemammals.gov.au/about/staff-and-students/brian-miller/</a>). See <a href="https://pubs.aip.org/asa/jasa/article/143/1/EL25/616424">Miller et al. 2018</a> for more information.</p>
+<p>We attached GPS to each of the four sonobuoys during the playback experiment, which provided high resolution tracking. This data provided a valuable dataset to test new methods for estimating sonobuoy drift developed by <a href="https://www.marinemammals.gov.au/about/staff-and-students/brian-miller/">Brian Miller of the Australian Marine Mammal Center</a>. See <a href="https://pubs.aip.org/asa/jasa/article/143/1/EL25/616424">Miller et al. 2018</a> for more information.</p>
 
 
 </section>
@@ -459,13 +474,14 @@ ul.task-list li input[type="checkbox"] {
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy
@@ -494,6 +510,11 @@ ul.task-list li input[type="checkbox"] {
           if (link.dataset.originalHref !== undefined) {
             link.href = link.dataset.originalHref;
           }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
         }
       }
     function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
