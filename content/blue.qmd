@@ -2,9 +2,29 @@
 title: "Blue Whale"
 format: html
 ---
-## NE Pacific Blue Whales
 
+Blue whale vocalizations are low-frequency and can travel great distances in the ocean; blue whale song varies geographically, and these sounds may be useful for discriminating and monitoring different populations.
+
+## N Pacific Blue Whales
+
+::::: columns
+::: {.column width="40%"}
+Blue whales have been sighted throughout the North Pacific Ocean, with two geographically distinct blue whale call types: Northwestern and Northeastern Pacific blue whale calls. While both calls have been well documented throughout the North Pacific Ocean, prior to our report the western calls had never been visually linked to a blue whales.
+
+In this study, sonobuoys were deployed in the presence of sighted blue whales as well as at select locations along the Aleutian Island chain. Type I, II, and V vocalizations were recorded in the presence of a blue whale sighted on 19 August 2024.
+
+These data provide additional information on the distribution of blue whales throughout these waters as well as a confirmation of sounds previously attributed to northwestern blue whales.
+:::
+
+::: {.column width="60%"}
+![Photograph of the blue whale sighted on 19 August 2004 at 52°3.3′N, 168°57.0′E (photograph by J. C. Salinas, SWFSC/NOAA).](images/NEBlue_Figure2.png){width="336"}
+
+![Location of blue whale sightings and opportunistic sonobuoy recordings of blue whales in northwestern and northcentral Pacific Ocean. Confirmed sightings of blue whales are designated with a star. Sonobuoy locations with sounds attributed to northwestern blue whale calls are shown as dark circles, sonobuoy locations with no blue whale sounds are shown as open circles.](images/NEBlue_Figure3.png){width="336"}
+
+![Spectrograms of northwestern Pacific blue whale Type I vocalization recorded in the Gulf of Alaska by Stafford et al. (2001), and Type II and Type V vocalization recorded in the vicinity of the blue whale sighted on 19 August 2004 (2 s FFT, 75% overlap, Hanning window).](images/NEBlue_Figure4.png){width="339"}
+:::
+:::::
+
+\[Link to Marine Mammal Publication\](<https://doi.org/10.1111/j.1748-7692.2006.00054.x>)
 
 ## ETP Blue Whales
-
-

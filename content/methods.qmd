@@ -6,9 +6,6 @@ editor:
 bibliography: references.bib
 ---
 
-Detail sonobuoy methods here, provide links to info. Also include
-summaries/links to papers (thode, miller, navy project, ASCR info, etc)
-
 ## Field Methods
 
 Sonobuoys are expendable drifting recorders housed in a compact cylinder
@@ -43,9 +40,38 @@ Analog sonobuoy recordings were digitized by playing back analog
 recordings through a Soundblaster Extigy sound card to a computer using
 RavenPro (48kHz sample rate, 16-bit, 10 min file size). Not all analog
 recordings were digitized; a list of digitized recordings can be found
-here(LINK). Digitized recordings (wav files) are reviewed in RavenPro.
-Recordings are scanned twice to better monitor at mid- and
+here (**LINK**). Digitized recordings (wav files) are reviewed in
+RavenPro. Recordings are scanned twice to better monitor at mid- and
 low-frequencies.
+
+### *Standardized Review*
+
+Audio files were decimated using
+\[Triton\](https://github.com/MarineBioAcousticsRC/Triton) v1.93 at 10x
+and and 100x, giving 4800 Hz and 480 Hz decimated sample rate,
+respectively. Data were reviewed at both of these decimation rates for
+DIFAR buoys, and an additional review at full bandwidth (48 kHz) was
+conducted for omni directional recordings from so
+
+For mid-frequency review, recordings decimated to 4800 Hz were reviewed
+using RavenPro Software (v1.6.4). Page size = 60 seconds, 90% increment,
+10% step increment. View only spectrogram (not waveform), 2 rows with
+512 FFT with 200 Hz to 2400 Hz in window.
+
+-   ***Identify Start and End of recordings.*** For each START (either
+    at the beginning, or after a bout of noise where I selected to END),
+    create a box where the START of the box lies on the noise. Annotate
+    start_end as 'start' and NA for others. For each END (either at the
+    end of a good bout of recording or the end of the entire recording),
+    create a box where the end of the box lies on the end of the good
+    recording (note: the end of a good recording can also identify the
+    start of bad noise). If this is the end of a recording, then label
+    the other annotations as "NA". If this is the end of a good
+    recording but start of noise, label the detection as "noise" and the
+    quality as NA.
+
+-   ***Detection of Sounds.*** Biological sounds were annotated in
+    Raven.
 
 ## Playback Experiment and Methods Development
 

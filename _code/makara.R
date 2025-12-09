@@ -26,6 +26,100 @@ detector_codes <- "MANUAL"
 analysis_organization_code <- "SWFSC"
 analysis_analysts <- "SRANKIN"
 
+#################################################
+#####  Merge Sonobuoy Data from All Surveys #####
+#################################################
+
+library(tidyverse)
+library(lubridate)
+
+#-------------------------------------------------------------
+# 1. List all CSV files
+#-------------------------------------------------------------
+files <- list.files(here("_data/surveyData"), pattern = "\\.csv$", full.names = TRUE)
+
+#-------------------------------------------------------------
+# 2. Define column types you want
+#-------------------------------------------------------------
+char_cols <- c("Sonobuoy Type", "Cruise", "Depth", "Sounds Detected",
+               "Additional Tapes?", "Recording Reviewed?", "Comments")
+
+num_cols  <- c("Latitude", "Longitude", "Sonobuoy Number", "Sighting Number",
+               "Channel", "Hours to Scuttle", "Bad Buoys", "Ship Noise?",
+               "Difar Signal?", "Water Noise?", "Biological Sounds?",
+               "DAT Tape Number", "Reception Distance (nmi)")
+
+#-------------------------------------------------------------
+# 3. Function to read + clean each file
+#-------------------------------------------------------------
+read_and_clean <- function(path) {
+  
+  # Extract filename only
+  fname <- basename(path)
+  
+  # Extract year and cruise name
+  # Filename format: Sonobuoys_YYYY_CruiseName.csv
+  year   <- str_extract(fname, "(?<=Sonobuoys_)\\d{4}(?=_)")
+  cruise <- str_extract(fname, "(?<=\\d{4}_).+(?=\\.csv)")
+  
+  df <- read_csv(path, show_col_types = FALSE) %>%
+    mutate(
+      # Add year and cruise columns
+      year = year,
+      cruise_name = cruise
+    )
+  
+  #-----------------------------------------------------------
+  # 4. Fix Date column — allow multiple input formats
+  #-----------------------------------------------------------
+  # Accepts formats like:
+  #   "2020-01-05 13:20", "01/05/2020 1:20 PM", "2020/01/05", etc.
+  df <- df %>%
+    mutate(
+      Date = parse_date_time(
+        Date,
+        orders = c("Ymd HMS", "Ymd HM", "Ymd",
+                   "mdY HMS", "mdY HM", "mdY",
+                   "dmY HMS", "dmY HM", "dmY")
+      )
+    )
+  
+  #-----------------------------------------------------------
+  # 5. Convert column classes
+  #-----------------------------------------------------------
+  # Convert character columns
+  for (col in char_cols) {
+    if (col %in% names(df)) {
+      df[[col]] <- as.character(df[[col]])
+    }
+  }
+  
+  # Convert numeric columns
+  for (col in num_cols) {
+    if (col %in% names(df)) {
+      df[[col]] <- suppressWarnings(as.numeric(df[[col]]))
+    }
+  }
+  
+  df
+}
+
+#-------------------------------------------------------------
+# 6. Apply function to all files and merge into one tibble
+#-------------------------------------------------------------
+surveyData <- files %>%
+  map_dfr(read_and_clean)
+
+#-------------------------------------------------------------
+# 7. Final formatting of Date column to standard output format
+#-------------------------------------------------------------
+surveyData <- surveyData %>%
+  mutate(Date = format(Date, "%Y-%m-%d %H:%M"))
+
+#-------------------------------------------------------------
+# 8. Save as a csv file in the _data folder
+#-------------------------------------------------------------
+write_csv(surveyData, here("_data/surveyData.csv"))
 
 
 ################################## 

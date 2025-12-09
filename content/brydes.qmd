@@ -3,4 +3,28 @@ title: "Bryde's Whale"
 format: html
 ---
 
-detail brydes whale work
+
+
+
+## Methods
+
+Audio files were decimated using Triton vXXX (Matlab, cite) at 10x and
+and 100x, giving 4800 Hz and 480 Hz decimated sample rate, respectively.
+Data were reviewed at both of these decimation rates for DIFAR buoys,
+and an additional review at full bandwidth (48 kHz) was conducted for
+omni directional recordings from sonobuoy types 57.
+
+### Mid-Frequency Review
+
+Recordings decimated to 4800 Hz were reviewed using RavenPro Software
+(v1.6.4). Page size = 60 seconds, 90% increment, 10% step increment.
+View only spectrogram (not waveform), 2 rows with 512 FFT with 200 Hz to
+2400 Hz in window.
+
+For each recording, the Start and End of the monitoring/review were noted (including end/restart due to any noise that reduces ability to detect calls of interest). 
+
+
+
+
+
+

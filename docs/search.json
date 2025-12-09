@@ -96,12 +96,12 @@
   {
     "objectID": "content/sei.html",
     "href": "content/sei.html",
-    "title": "sei_hawaii",
+    "title": "Sei Whale",
     "section": "",
-    "text": "Detail sei whale hawaii data",
+    "text": "## Hawaii Sei Whales\n## CCE Sei Whales",
     "crumbs": [
       "Projects",
-      "sei_hawaii"
+      "Sei Whale"
     ]
   },
   {
@@ -109,7 +109,7 @@
     "href": "content/methods.html",
     "title": "Methods",
     "section": "",
-    "text": "Detail sonobuoy methods here, provide links to info. Also include summaries/links to papers (thode, miller, navy project, ASCR info, etc)",
+    "text": "Sonobuoys are expendable drifting recorders housed in a compact cylinder for deployment from ships or airplanes. When the buoys are deployed, the hydrophone drops to a pre-determined depth and a float inflates at the surface. The multi-plexed signal containing the audio and DIFAR information is transmitted from an antenna embedded in the float; this signal can be received using a VHF receiver. Specialized receivers are required to obtain the full low-frequency audio, and specialized software is required to demultiplex the DIFAR signal. Field methods have evolved over the years from analog to digital formats (sonobuoy guidelines for select years can be found in the repository supplement folder), and Rankin et al. (2019) provides detailed information on using sonobuoys for ceteacean surveys based on decades of research.",
     "crumbs": [
       "Methods"
     ]
@@ -117,23 +117,23 @@
   {
     "objectID": "content/brydes.html",
     "href": "content/brydes.html",
-    "title": "brydes",
+    "title": "Bryde’s Whale",
     "section": "",
-    "text": "detail brydes whale work",
+    "text": "Audio files were decimated using Triton vXXX (Matlab, cite) at 10x and and 100x, giving 4800 Hz and 480 Hz decimated sample rate, respectively. Data were reviewed at both of these decimation rates for DIFAR buoys, and an additional review at full bandwidth (48 kHz) was conducted for omni directional recordings from sonobuoy types 57.\n\n\nRecordings decimated to 4800 Hz were reviewed using RavenPro Software (v1.6.4). Page size = 60 seconds, 90% increment, 10% step increment. View only spectrogram (not waveform), 2 rows with 512 FFT with 200 Hz to 2400 Hz in window.\nFor each recording, the Start and End of the monitoring/review were noted (including end/restart due to any noise that reduces ability to detect calls of interest).",
     "crumbs": [
       "Projects",
-      "brydes"
+      "Bryde's Whale"
     ]
   },
   {
     "objectID": "content/blue.html",
     "href": "content/blue.html",
-    "title": "blue",
+    "title": "Blue Whale",
     "section": "",
-    "text": "detail iwc blue whale work with links",
+    "text": "Blue whale vocalizations are low-frequency and can travel great distances in the ocean; blue whale song varies geographically, and these sounds may be useful for discriminating and monitoring different populations.",
     "crumbs": [
       "Projects",
-      "blue"
+      "Blue Whale"
     ]
   },
   {
@@ -154,6 +154,89 @@
     "text": "Identify projects here with links to pages, reports, etc.",
     "crumbs": [
       "Projects"
+    ]
+  },
+  {
+    "objectID": "content/methods.html#field-methods",
+    "href": "content/methods.html#field-methods",
+    "title": "Methods",
+    "section": "",
+    "text": "Sonobuoys are expendable drifting recorders housed in a compact cylinder for deployment from ships or airplanes. When the buoys are deployed, the hydrophone drops to a pre-determined depth and a float inflates at the surface. The multi-plexed signal containing the audio and DIFAR information is transmitted from an antenna embedded in the float; this signal can be received using a VHF receiver. Specialized receivers are required to obtain the full low-frequency audio, and specialized software is required to demultiplex the DIFAR signal. Field methods have evolved over the years from analog to digital formats (sonobuoy guidelines for select years can be found in the repository supplement folder), and Rankin et al. (2019) provides detailed information on using sonobuoys for ceteacean surveys based on decades of research.",
+    "crumbs": [
+      "Methods"
+    ]
+  },
+  {
+    "objectID": "content/methods.html#analysis-methods",
+    "href": "content/methods.html#analysis-methods",
+    "title": "Methods",
+    "section": "Analysis Methods",
+    "text": "Analysis Methods\nMost sonobuoys were monitored in real-time by field researchers, and field notes can be found in the fieldNotes folder in the SWFSC-PAM-Sonobuoy github repository.\nSelect sonobuoy deployments were analyzed for publications, where specific methods are outlined in each publication (see publications)\nA standardized review of select sonobuoy is ongoing, as time allows. Analog sonobuoy recordings were digitized by playing back analog recordings through a Soundblaster Extigy sound card to a computer using RavenPro (48kHz sample rate, 16-bit, 10 min file size). Not all analog recordings were digitized; a list of digitized recordings can be found here (LINK). Digitized recordings (wav files) are reviewed in RavenPro. Recordings are scanned twice to better monitor at mid- and low-frequencies.\n\nStandardized Review\nAudio files were decimated using [Triton](https://github.com/MarineBioAcousticsRC/Triton) v1.93 at 10x and and 100x, giving 4800 Hz and 480 Hz decimated sample rate, respectively. Data were reviewed at both of these decimation rates for DIFAR buoys, and an additional review at full bandwidth (48 kHz) was conducted for omni directional recordings from so\nFor mid-frequency review, recordings decimated to 4800 Hz were reviewed using RavenPro Software (v1.6.4). Page size = 60 seconds, 90% increment, 10% step increment. View only spectrogram (not waveform), 2 rows with 512 FFT with 200 Hz to 2400 Hz in window.\n\nIdentify Start and End of recordings. For each START (either at the beginning, or after a bout of noise where I selected to END), create a box where the START of the box lies on the noise. Annotate start_end as ‘start’ and NA for others. For each END (either at the end of a good bout of recording or the end of the entire recording), create a box where the end of the box lies on the end of the good recording (note: the end of a good recording can also identify the start of bad noise). If this is the end of a recording, then label the other annotations as “NA”. If this is the end of a good recording but start of noise, label the detection as “noise” and the quality as NA.\nDetection of Sounds. Biological sounds were annotated in Raven.",
+    "crumbs": [
+      "Methods"
+    ]
+  },
+  {
+    "objectID": "content/methods.html#playback-experiment-and-methods-development",
+    "href": "content/methods.html#playback-experiment-and-methods-development",
+    "title": "Methods",
+    "section": "Playback Experiment and Methods Development",
+    "text": "Playback Experiment and Methods Development\nIn 2016, SWFSC conducted a playback experiment for the purpose of estimating the precision and accuracy of bearing angle estimation. This was part of a larger Navy-funded project to investigate the potential for using sonobuoys as a tool to estimate cetacean density in offshore waters (Rankin et al. 2017). This data has been useful for methods development on several projects, and this data is publicly available for future projects (Link to NCEI Data Portal).\n\nAcoustic Spatial Capture Recapture\n\nSWFSC collaborated with Ben Stevenson (University of Aukland) to evaluate the potential use of Acoustic Spatial Capture Recapture (ASCR) methods to estimate call density across clustered sonobuoys. While a simulation suggested these methods should be feasible, application to real data identified a number of complications and errors that precluded adoption of ASCR for these cases. Links to summaries of the sonobuoy SCR models and application to real data.\n\nAzigram Displays for DIFAR Sonobuoys\n\nAs part of a larger methods paper led by Aaron Thode (Scripps Institution of Oceanography), this playback data provided a means of testing the capabilities of using Azigrams to enhance the accuracy of bearing measurements of weak frequency-modulated signals. See Thode et al. 2019 for more information.\n\n\n\nEstimating Sonobuoy Drift\n\nWe attached GPS to each of the four sonobuoys during the playback experiment, which provided high resolution tracking. This data provided a valuable dataset to test new methods for estimating sonobuoy drift developed by Brian Miller of the Australian Marine Mammal Center. See Miller et al. 2018 for more information.",
+    "crumbs": [
+      "Methods"
+    ]
+  },
+  {
+    "objectID": "content/blue.html#n-pacific-blue-whales",
+    "href": "content/blue.html#n-pacific-blue-whales",
+    "title": "Blue Whale",
+    "section": "N Pacific Blue Whales",
+    "text": "N Pacific Blue Whales\n\n\nBlue whales have been sighted throughout the North Pacific Ocean, with two geographically distinct blue whale call types: Northwestern and Northeastern Pacific blue whale calls. While both calls have been well documented throughout the North Pacific Ocean, prior to our report the western calls had never been visually linked to a blue whales.\nIn this study, sonobuoys were deployed in the presence of sighted blue whales as well as at select locations along the Aleutian Island chain. Type I, II, and V vocalizations were recorded in the presence of a blue whale sighted on 19 August 2024.\nThese data provide additional information on the distribution of blue whales throughout these waters as well as a confirmation of sounds previously attributed to northwestern blue whales.\n\n\n\n\nPhotograph of the blue whale sighted on 19 August 2004 at 52°3.3′N, 168°57.0′E (photograph by J. C. Salinas, SWFSC/NOAA).\n\n\n\n\n\nLocation of blue whale sightings and opportunistic sonobuoy recordings of blue whales in northwestern and northcentral Pacific Ocean. Confirmed sightings of blue whales are designated with a star. Sonobuoy locations with sounds attributed to northwestern blue whale calls are shown as dark circles, sonobuoy locations with no blue whale sounds are shown as open circles.\n\n\n\n\n\nSpectrograms of northwestern Pacific blue whale Type I vocalization recorded in the Gulf of Alaska by Stafford et al. (2001), and Type II and Type V vocalization recorded in the vicinity of the blue whale sighted on 19 August 2004 (2 s FFT, 75% overlap, Hanning window).\n\n\n\n\n[Link to Marine Mammal Publication](https://doi.org/10.1111/j.1748-7692.2006.00054.x)",
+    "crumbs": [
+      "Projects",
+      "Blue Whale"
+    ]
+  },
+  {
+    "objectID": "content/blue.html#etp-blue-whales",
+    "href": "content/blue.html#etp-blue-whales",
+    "title": "Blue Whale",
+    "section": "ETP Blue Whales",
+    "text": "ETP Blue Whales",
+    "crumbs": [
+      "Projects",
+      "Blue Whale"
+    ]
+  },
+  {
+    "objectID": "content/brydes.html#methods",
+    "href": "content/brydes.html#methods",
+    "title": "Bryde’s Whale",
+    "section": "",
+    "text": "Audio files were decimated using Triton vXXX (Matlab, cite) at 10x and and 100x, giving 4800 Hz and 480 Hz decimated sample rate, respectively. Data were reviewed at both of these decimation rates for DIFAR buoys, and an additional review at full bandwidth (48 kHz) was conducted for omni directional recordings from sonobuoy types 57.\n\n\nRecordings decimated to 4800 Hz were reviewed using RavenPro Software (v1.6.4). Page size = 60 seconds, 90% increment, 10% step increment. View only spectrogram (not waveform), 2 rows with 512 FFT with 200 Hz to 2400 Hz in window.\nFor each recording, the Start and End of the monitoring/review were noted (including end/restart due to any noise that reduces ability to detect calls of interest).",
+    "crumbs": [
+      "Projects",
+      "Bryde's Whale"
+    ]
+  },
+  {
+    "objectID": "content/publications.html",
+    "href": "content/publications.html",
+    "title": "publications",
+    "section": "",
+    "text": "Jones, B., Rankin, S., & Archer, E. (2011). Fin whale acoustics as a tool to assess stock structure in the North Pacific. U.S. Department of Commerce, National Marine Fisheries Service Technical Memorandum NOAA-TM-NMFS-SWFSC-485. 23 pp. PDF\nMiller, B. S., Wotherspoon, S., Rankin, S., Calderan, S., Leaper, R., & Keating, J. L. (2018). Estimating drift of directional sonobuoys from acoustic bearings. The Journal of the Acoustical Society of America, 143(1), EL25-EL30. doi.org/10.1121/1.5020621\nOleson, E. M., Barlow, J., Gordon, J., Rankin, S., & Hildebrand, J. A. (2003). LOW FREQUENCY CALLS OF BRYDE’S WHALES. Marine Mammal Science, 19(2), 407-419. doi.org/10.1111/j.1748-7692.2003.tb01119.x\nOu, H., Au, W. W., Van Parijs, S., Oleson, E. M., & Rankin, S. (2015). Discrimination of frequency-modulated Baleen whale downsweep calls with overlapping frequencies. The Journal of the Acoustical Society of America, 137(6), 3024-3032.//doi.org/10.1121/1.4919304\nRankin, S. (2008). Acoustic studies of marine mammals during seven years of combined visual and acoustic line-transect surveys for cetaceans in the eastern and central Pacific Ocean. U.S. Department of Commerce, National Marine Fisheries Service Technical Memorandum NOAA-TM-NMFS-SWFSC-429. 58 pp. PDF\nRankin, S., & Barlow, J. (2007). Vocalizations of the sei whale Balaenoptera borealis off the Hawaiian Islands. Bioacoustics, 16(2), 137-145. PDF\nRankin, S., Barlow, J., & Stafford, K. M. (2006). Blue whale (Balaenoptera musculus) sightings and recordings south of the Aleutian Islands. Marine Mammal Science, 22(3), 708-713. doi.org/10.1111/j.1748-7692.2006.00054.x\nRankin, S., Miller, B., Crance, J. L., Sakai, T., & Keating, J. L. (2019). Sonobuoy acoustic data collection during cetacean surveys. U.S. Department of Commerce, National Marine Fisheries Service Technical Memorandum NOAA-TM-NMFS-SWFSC-614. 36 pp. PDF\nThode, A. M., Sakai, T., Michalec, J., Rankin, S., Soldevilla, M. S., Martin, B., & Kim, K. H. (2019). Displaying bioacoustic directional information from sonobuoys using “azigrams”. The Journal of the Acoustical Society of America, 146(1), 95-102. doi.org/10.1121/1.511481\nWade, P.R., De Robertis, A., Hough, K.R., Booth, R., Kennedy, A., LeDuc, R.G., Munger, L., Napp, J., Shelden, K.E.W., Rankin, S. and Vasquez, O. (2011). Rare detections of North Pacific right whales in the Gulf of Alaska, with observations of their potential prey. Endangered Species Research, 13(2), 99-109.doi.org/10.3354/esr00324\nWade, P., Heide-Jørgensen, M.P., Shelden, K., Barlow, J., Carretta, J., Durban, J., LeDuc, R., Munger, L., Rankin, S., Sauter, A. and Stinchcomb, C. (2006). Acoustic detection and satellite-tracking leads to discovery of rare concentration of endangered North Pacific right whales. Biology letters, 2(3), 417-419. doi.org/10.1098/rsbl.2006.0460",
+    "crumbs": [
+      "Publications"
+    ]
+  },
+  {
+    "objectID": "content/publications.html#publications-based-on-swfsc-sonobuoy-recordings-and-playback-studies",
+    "href": "content/publications.html#publications-based-on-swfsc-sonobuoy-recordings-and-playback-studies",
+    "title": "publications",
+    "section": "",
+    "text": "Jones, B., Rankin, S., & Archer, E. (2011). Fin whale acoustics as a tool to assess stock structure in the North Pacific. U.S. Department of Commerce, National Marine Fisheries Service Technical Memorandum NOAA-TM-NMFS-SWFSC-485. 23 pp. PDF\nMiller, B. S., Wotherspoon, S., Rankin, S., Calderan, S., Leaper, R., & Keating, J. L. (2018). Estimating drift of directional sonobuoys from acoustic bearings. The Journal of the Acoustical Society of America, 143(1), EL25-EL30. doi.org/10.1121/1.5020621\nOleson, E. M., Barlow, J., Gordon, J., Rankin, S., & Hildebrand, J. A. (2003). LOW FREQUENCY CALLS OF BRYDE’S WHALES. Marine Mammal Science, 19(2), 407-419. doi.org/10.1111/j.1748-7692.2003.tb01119.x\nOu, H., Au, W. W., Van Parijs, S., Oleson, E. M., & Rankin, S. (2015). Discrimination of frequency-modulated Baleen whale downsweep calls with overlapping frequencies. The Journal of the Acoustical Society of America, 137(6), 3024-3032.//doi.org/10.1121/1.4919304\nRankin, S. (2008). Acoustic studies of marine mammals during seven years of combined visual and acoustic line-transect surveys for cetaceans in the eastern and central Pacific Ocean. U.S. Department of Commerce, National Marine Fisheries Service Technical Memorandum NOAA-TM-NMFS-SWFSC-429. 58 pp. PDF\nRankin, S., & Barlow, J. (2007). Vocalizations of the sei whale Balaenoptera borealis off the Hawaiian Islands. Bioacoustics, 16(2), 137-145. PDF\nRankin, S., Barlow, J., & Stafford, K. M. (2006). Blue whale (Balaenoptera musculus) sightings and recordings south of the Aleutian Islands. Marine Mammal Science, 22(3), 708-713. doi.org/10.1111/j.1748-7692.2006.00054.x\nRankin, S., Miller, B., Crance, J. L., Sakai, T., & Keating, J. L. (2019). Sonobuoy acoustic data collection during cetacean surveys. U.S. Department of Commerce, National Marine Fisheries Service Technical Memorandum NOAA-TM-NMFS-SWFSC-614. 36 pp. PDF\nThode, A. M., Sakai, T., Michalec, J., Rankin, S., Soldevilla, M. S., Martin, B., & Kim, K. H. (2019). Displaying bioacoustic directional information from sonobuoys using “azigrams”. The Journal of the Acoustical Society of America, 146(1), 95-102. doi.org/10.1121/1.511481\nWade, P.R., De Robertis, A., Hough, K.R., Booth, R., Kennedy, A., LeDuc, R.G., Munger, L., Napp, J., Shelden, K.E.W., Rankin, S. and Vasquez, O. (2011). Rare detections of North Pacific right whales in the Gulf of Alaska, with observations of their potential prey. Endangered Species Research, 13(2), 99-109.doi.org/10.3354/esr00324\nWade, P., Heide-Jørgensen, M.P., Shelden, K., Barlow, J., Carretta, J., Durban, J., LeDuc, R., Munger, L., Rankin, S., Sauter, A. and Stinchcomb, C. (2006). Acoustic detection and satellite-tracking leads to discovery of rare concentration of endangered North Pacific right whales. Biology letters, 2(3), 417-419. doi.org/10.1098/rsbl.2006.0460",
+    "crumbs": [
+      "Publications"
     ]
   }
 ]

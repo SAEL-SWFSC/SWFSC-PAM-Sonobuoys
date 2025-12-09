@@ -1,0 +1,34 @@
+---
+title: "brydes"
+output: html_document
+---
+```{r prep}
+source(here::here("_code/_commonR.R"))
+
+surveyData <- read_csv(here("_data/surveyData.csv")) %>%
+  clean_names()
+
+review <- read.csv(here("_data/swfsc_sonobuoy_manualReview.csv"))%>%
+  clean_names() 
+#Next, merge these so that all the files in review have the important info (date, time, lat long,etc). Might need to be sure there is a specific ID column like CruiseNum_SBnum or something
+
+```
+# Brydes Map
+
+Map with bathymetry 
+- Small black dots for brydes whale detections 
+- Small yellow dots for brydes whale detections with calls
+- Small yellow stars for brydes whale detections with 500 Hz pulses 
+
+# Table of deployments, good recording time, species deployed on, species within 10nmi or 2 hours
+
+Cruise name, deploy ID, date/time, Sighting # & Species, Species w/in 10nmi or 2 hours
+```{r deployTable}
+
+
+
+```
+
+ 
+#Table of detections
+For each call type, give median and 10th, 90th percentiles for: duration of call (s), low frequency (Hz), high frequency (Hz), center frequency (Hz), peak frequency (Hz), delta frequency (Hz), and signal-to-noise ratio (dB). Where appropriate, give ICI and IPI.
