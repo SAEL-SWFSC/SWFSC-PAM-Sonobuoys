@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.25">
+<meta name="generator" content="quarto-1.8.26">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -39,9 +39,9 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-707d8167ce6003fca903bfe2be84ab7f.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-b758ccaa5987ceb1b75504551e579abf.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../site_libs/bootstrap/bootstrap-3fe749c4c491919af384cf3d21cd6cd9.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
@@ -344,7 +344,10 @@ ul.task-list li input[type="checkbox"] {
    
   <ul>
   <li><a href="#field-methods" id="toc-field-methods" class="nav-link active" data-scroll-target="#field-methods">Field Methods</a></li>
-  <li><a href="#analysis-methods" id="toc-analysis-methods" class="nav-link" data-scroll-target="#analysis-methods">Analysis Methods</a></li>
+  <li><a href="#analysis-methods" id="toc-analysis-methods" class="nav-link" data-scroll-target="#analysis-methods">Analysis Methods</a>
+  <ul class="collapse">
+  <li><a href="#standardized-review" id="toc-standardized-review" class="nav-link" data-scroll-target="#standardized-review"><em>Standardized Review</em></a></li>
+  </ul></li>
   <li><a href="#playback-experiment-and-methods-development" id="toc-playback-experiment-and-methods-development" class="nav-link" data-scroll-target="#playback-experiment-and-methods-development">Playback Experiment and Methods Development</a>
   <ul class="collapse">
   <li><a href="#acoustic-spatial-capture-recapture" id="toc-acoustic-spatial-capture-recapture" class="nav-link" data-scroll-target="#acoustic-spatial-capture-recapture">Acoustic Spatial Capture Recapture</a></li>
@@ -376,7 +379,6 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Detail sonobuoy methods here, provide links to info. Also include summaries/links to papers (thode, miller, navy project, ASCR info, etc)</p>
 <section id="field-methods" class="level2">
 <h2 class="anchored" data-anchor-id="field-methods">Field Methods</h2>
 <p>Sonobuoys are expendable drifting recorders housed in a compact cylinder for deployment from ships or airplanes. When the buoys are deployed, the hydrophone drops to a pre-determined depth and a float inflates at the surface. The multi-plexed signal containing the audio and DIFAR information is transmitted from an antenna embedded in the float; this signal can be received using a VHF receiver. Specialized receivers are required to obtain the full low-frequency audio, and specialized software is required to demultiplex the DIFAR signal. Field methods have evolved over the years from analog to digital formats (sonobuoy guidelines for select years can be found in the repository <a href="https://github.com/SAEL-SWFSC/SWFSC-PAM-Sonobuoys/tree/main/supplement">supplement folder</a>), and <a href="https://repository.library.noaa.gov/view/noaa/20265">Rankin et al. (2019)</a> provides detailed information on using sonobuoys for ceteacean surveys based on decades of research.</p>
@@ -385,7 +387,16 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="analysis-methods">Analysis Methods</h2>
 <p>Most sonobuoys were monitored in real-time by field researchers, and field notes can be found in the <a href="https://github.com/SAEL-SWFSC/SWFSC-PAM-Sonobuoys/tree/main/supplement/fieldNotes">fieldNotes folder</a> in the SWFSC-PAM-Sonobuoy github repository.</p>
 <p>Select sonobuoy deployments were analyzed for publications, where specific methods are outlined in each publication (see <a href="https://sael-swfsc.github.io/SWFSC-PAM-Sonobuoys/content/publications.html">publications</a>)</p>
-<p>A standardized review of select sonobuoy is ongoing, as time allows. Analog sonobuoy recordings were digitized by playing back analog recordings through a Soundblaster Extigy sound card to a computer using RavenPro (48kHz sample rate, 16-bit, 10 min file size). Not all analog recordings were digitized; a list of digitized recordings can be found here(LINK). Digitized recordings (wav files) are reviewed in RavenPro. Recordings are scanned twice to better monitor at mid- and low-frequencies.</p>
+<p>A standardized review of select sonobuoy is ongoing, as time allows. Analog sonobuoy recordings were digitized by playing back analog recordings through a Soundblaster Extigy sound card to a computer using RavenPro (48kHz sample rate, 16-bit, 10 min file size). Not all analog recordings were digitized; a list of digitized recordings can be found here (<strong>LINK</strong>). Digitized recordings (wav files) are reviewed in RavenPro. Recordings are scanned twice to better monitor at mid- and low-frequencies.</p>
+<section id="standardized-review" class="level3">
+<h3 class="anchored" data-anchor-id="standardized-review"><em>Standardized Review</em></h3>
+<p>Audio files were decimated using [Triton](https://github.com/MarineBioAcousticsRC/Triton) v1.93 at 10x and and 100x, giving 4800 Hz and 480 Hz decimated sample rate, respectively. Data were reviewed at both of these decimation rates for DIFAR buoys, and an additional review at full bandwidth (48 kHz) was conducted for omni directional recordings from so</p>
+<p>For mid-frequency review, recordings decimated to 4800 Hz were reviewed using RavenPro Software (v1.6.4). Page size = 60 seconds, 90% increment, 10% step increment. View only spectrogram (not waveform), 2 rows with 512 FFT with 200 Hz to 2400 Hz in window.</p>
+<ul>
+<li><p><strong><em>Identify Start and End of recordings.</em></strong> For each START (either at the beginning, or after a bout of noise where I selected to END), create a box where the START of the box lies on the noise. Annotate start_end as ‘start’ and NA for others. For each END (either at the end of a good bout of recording or the end of the entire recording), create a box where the end of the box lies on the end of the good recording (note: the end of a good recording can also identify the start of bad noise). If this is the end of a recording, then label the other annotations as “NA”. If this is the end of a good recording but start of noise, label the detection as “noise” and the quality as NA.</p></li>
+<li><p><strong><em>Detection of Sounds.</em></strong> Biological sounds were annotated in Raven.</p></li>
+</ul>
+</section>
 </section>
 <section id="playback-experiment-and-methods-development" class="level2">
 <h2 class="anchored" data-anchor-id="playback-experiment-and-methods-development">Playback Experiment and Methods Development</h2>
