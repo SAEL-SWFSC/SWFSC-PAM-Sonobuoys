@@ -1,0 +1,12 @@
+---
+title: "ohun"
+output: html_document
+---
+
+To use ohun for auto detection, use reference annotations and either template or energy based detection
+
+Consider using detections from sighted recordings for reference annotations, and then applying to hiceas2010, hiceas2017 (see [here](https://youtu.be/dYlkDCUTbAs?si=jeakjBXvzHeyjC5z&t=1318))
+
+
+see code here: https://github.com/eco4cast/Statistical-Methods-Seminar-Series
+

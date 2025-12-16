@@ -1,9 +1,15 @@
 ---
-title: "brydes"
+title: "Brydes Data Analysis"
 output: html_document
 ---
-```{r prep}
+Give explicit instructions for working with data in Raven
+
+
+# Merge survey data and analysis to create a single sonobuoy data file (this should probably go into the _commonR.r file and saved??)
+```{r surveyDataprep}
 source(here::here("_code/_commonR.R"))
+library(Rraven)
+library(warbleR)
 
 surveyData <- read_csv(here("_data/surveyData.csv")) %>%
   clean_names()
@@ -12,7 +18,48 @@ review <- read.csv(here("_data/swfsc_sonobuoy_manualReview.csv"))%>%
   clean_names() 
 #Next, merge these so that all the files in review have the important info (date, time, lat long,etc). Might need to be sure there is a specific ID column like CruiseNum_SBnum or something
 
+surveyBrydes <- xxx #subset this data to only include survey data where "Brydes" detections are TRUE
+  
+
+
 ```
+
+Import/Merge/Modify Selection Tables
+```{r ravenDataprep}
+# List all your files
+myPath <- "W:/Sonobuoys/d10_SelectionTables"#path for selection tables
+
+list.files(path = myPath , pattern = "\\.txt$")  # List files in myPath
+
+
+# Import raven data (providing the name of the column with the sound file names) in format that accommodates warbleR functions. Note, if you want to work with the time series (in warblR), then add argument <waveform = TRUE>.
+d10 <- imp_raven(sound.file.col = "End.File", all.data = TRUE, ext.case = 'upper',
+                 name.from.file = TRUE, path = myPath) 
+#to work with warbleR, use d10w
+d10w <- imp_raven(sound.file.col = "End.File", all.data = TRUE, ext.case = 'upper',
+                     name.from.file = TRUE, warbler.format =  TRUE, path = myPath) 
+
+
+## If I want to extract time series for use in warbleR
+# create spectrograms and put them in a folder for review
+
+
+# can I use this to export wav files of selections with a buffer?
+
+# spectro-analysis in warbleR, can also measure harmonic features
+
+# cross-correlation-- pair-wise similarity of the sounds, might want to do to quantify sounds from different encounters. Gives a similarity matrix to see which sounds are more similar to each other.
+
+
+
+
+```
+
+
+
+
+
+
 # Brydes Map
 
 Map with bathymetry 
