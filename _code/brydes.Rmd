@@ -2,7 +2,85 @@
 title: "Brydes Data Analysis"
 output: html_document
 ---
-Give explicit instructions for working with data in Raven
+
+```{r prep}
+library(here)
+here()
+source(here::here("_code/_commonR.R"))
+
+```
+# Manual Review and Annotation
+Manual review was performed by an experienced researcher (SR) using RavenPro 1.6. For each recording with usable data, measurements were made to a selection table (see SWFSC-PAM-Sonobuoy-RavenPro-MeasurementPreset.ravenpreset in supplement folder in this repo) and three custom annotation columns were included (Start_End, Detection, Quality, following the SWFSC_PAM_Sonobuoy_Annotation_keymap.ravenpreset in the supplement folder in this repo).
+
+Effort was identified by a start effort (Start_End, Detection, Quality annotations of 1, 9, 9) at the beginning of the usable recording, and end of effort was identified (3, 9, 9) at the end of the usable effort. Bouts of noise were identified by a temporary end of the effort due to noise (end_noise, 3, 1, 9), and a restart after a bout of noise was annotated (start_noise, 1, 9, 9). Detections of potential biological sounds were identifed as a detection of a specific species (where Start_End = 9, Detection = species, and Quality = low/med/high). Selection tables were saved using the following naming format: Cruise#_RecordingID_YYMMDD_HHmm.Table1.selections.txt.
+
+For mid-frequency review, recordings decimated to 4800 Hz were reviewed using RavenPro Software (v1.6.4). Page size = 60 seconds, 90% increment, 10% step increment. View only spectrogram (not waveform), 2 rows with 512 FFT with 200 Hz to 2400 Hz in window. For each recording with usable data, measurements were made to a selection table (see SWFSC-PAM-Sonobuoy-RavenPro-MeasurementPreset.ravenpreset in supplement folder in this repo) and three custom annotation columns were included (Start_End, Detection, Quality, following the SWFSC_PAM_Sonobuoy_Annotation_keymap.ravenpreset in the supplement folder in this repo).
+
+For low-frequency review....
+
+
+
+
+# Effort
+For each selection file, first, review data and make sure all files pass an error check.
+
+Next Step:
+- Check each of the files with errors to see if I can fix each of these. Does it appear that the data check is working correctly? 
+- Once these are fixed, have chat GPT revise the overall function that checks for errors (stops if there is an error), and then creates the effort table.
+
+```{r brydesEffort_datacheck}
+library(tidyverse)
+library(janitor)
+library(lubridate)
+myPath <- "//SWC-CMAP2-N/pam3/Sonobuoys/sb_d10_SelectionTables"
+
+validation_results <- validate_effort_data(myPath)
+
+# Optionally save results to review
+if (validation_results$has_errors) {
+  write_csv(validation_results$errors, "validation_errors.csv")
+  write_csv(validation_results$summary, "validation_summary.csv")
+}
+
+```
+
+Estimate Effort (this currently estimates just for one folder, will ultimately want to create a table using both the low and the mid frequency analysis)
+```{r brydesEffort}
+
+#' Process Raven Selection Tables for Effort Analysis
+#'
+#' @param folder_path Path to folder containing Raven selection table text files
+#' @return A dataframe with effort metrics for each recording
+#' @export
+
+# Example usage:
+myPath <- "//SWC-CMAP2-N/pam3/Sonobuoys/sb_d10_SelectionTables"
+results <- process_effort_analysis(myPath)
+View(results)
+
+```
+
+
+
+# Brydes Map
+
+Map with bathymetry 
+- Small black dots for brydes whale detections 
+- Small yellow dots for brydes whale detections with calls
+- Small yellow stars for brydes whale detections with 500 Hz pulses 
+
+# Table of deployments, good recording time, species deployed on, species within 10nmi or 2 hours
+
+Cruise name, deploy ID, date/time, Sighting # & Species, Species w/in 10nmi or 2 hours
+```{r deployTable}
+
+
+
+```
+
+ 
+#Table of detections
+For each call type, give median and 10th, 90th percentiles for: duration of call (s), low frequency (Hz), high frequency (Hz), center frequency (Hz), peak frequency (Hz), delta frequency (Hz), and signal-to-noise ratio (dB). Where appropriate, give ICI and IPI.
 
 
 # Merge survey data and analysis to create a single sonobuoy data file (this should probably go into the _commonR.r file and saved??)
@@ -54,28 +132,3 @@ d10w <- imp_raven(sound.file.col = "End.File", all.data = TRUE, ext.case = 'uppe
 
 
 ```
-
-
-
-
-
-
-# Brydes Map
-
-Map with bathymetry 
-- Small black dots for brydes whale detections 
-- Small yellow dots for brydes whale detections with calls
-- Small yellow stars for brydes whale detections with 500 Hz pulses 
-
-# Table of deployments, good recording time, species deployed on, species within 10nmi or 2 hours
-
-Cruise name, deploy ID, date/time, Sighting # & Species, Species w/in 10nmi or 2 hours
-```{r deployTable}
-
-
-
-```
-
- 
-#Table of detections
-For each call type, give median and 10th, 90th percentiles for: duration of call (s), low frequency (Hz), high frequency (Hz), center frequency (Hz), peak frequency (Hz), delta frequency (Hz), and signal-to-noise ratio (dB). Where appropriate, give ICI and IPI.

@@ -1,0 +1,5 @@
+error_type,filename,details
+Invalid Filename Format,template.Table.1.selections.txt,Does not match expected pattern: Cruise#_RecordingName_YYMMDD_HHmm.Table.1.selections.txt
+Missing Start Effort,1629_SBDAT5_050823_2019.Table.1.selections.txt,"No (1, 9, 9) annotations found - missing start_effort"
+End Effort Error,1629_SBDAT5_050823_2019.Table.1.selections.txt,"Expected exactly 1 end_effort (3, 9, 9), found: 0"
+Unpaired Noise Annotations,1629_SBDAT5_050823_2019.Table.1.selections.txt,"restart_noise count: -1 | end_noise count: 0 - Each end_noise (3,1,9) should be followed by restart_noise (1,9,9)"
