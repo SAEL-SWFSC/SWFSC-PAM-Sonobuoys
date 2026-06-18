@@ -4,9 +4,72 @@ library(tidyverse)
 library(purrr)
 library(lubridate)
 library(janitor)
+library(warbleR)
+library(Rraven)
+library(dplyr)
+library(stringr)
+library(readr)
 
 #Add general functions
 
+################################
+# Merge Raven Selection Tables #
+################################
+
+merge_raven_tables <- function(folder_path, time_zone = "UTC") {
+  
+  # 1. Get a list of all selection table files in the directory
+  file_list <- list.files(path = folder_path, pattern = "\\.selections\\.txt$", full.names = TRUE)
+  
+  # Check if any files were actually found
+  if (length(file_list) == 0) {
+    stop("No selection table files ending in '.selections.txt' were found in the specified directory.")
+  }
+  
+  # 2. Inner helper function to process a single file
+  process_single_file <- function(file_path) {
+    fname <- basename(file_path)
+    
+    # Split filename by "_"
+    name_parts <- str_split(fname, "_")[[1]]
+    
+    cruise_num <- name_parts[1]
+    dat_num    <- name_parts[2]
+    date_str   <- name_parts[3]
+    time_str   <- name_parts[4]
+    
+    # Isolate just the 4-digit HHMM time
+    time_str   <- str_extract(time_str, "^\\d{4}")
+    
+    raw_datetime <- paste(date_str, time_str)
+    
+    # Read the tab-delimited Raven file
+    table_data <- read_delim(file_path, delim = "\t", show_col_types = FALSE)
+    
+    # Return NULL safely if the file is completely empty
+    if (nrow(table_data) == 0) return(NULL)
+    
+    # Add metadata and convert to POSIXct
+    table_data <- table_data %>%
+      mutate(
+        filename = fname,
+        cruise_number = cruise_num,
+        dat_number = dat_num,
+        date_time = as.POSIXct(raw_datetime, format = "%y%m%d %H%M", tz = time_zone)
+      )
+    
+    return(table_data)
+  }
+  
+  # 3. Use map_df to loop through files and bind them together
+  merged_df <- map_df(file_list, process_single_file)
+  
+  # 4. Clean all column names to snake_case using janitor
+  merged_df <- merged_df %>% 
+    clean_names()
+  
+  return(merged_df)
+}
 
 #######################################################
 # Validate Raven Selection Tables for Effort Analysis #

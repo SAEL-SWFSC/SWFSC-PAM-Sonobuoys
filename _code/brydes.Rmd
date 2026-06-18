@@ -12,13 +12,34 @@ source(here::here("_code/_commonR.R"))
 # Manual Review and Annotation
 Manual review was performed by an experienced researcher (SR) using RavenPro 1.6. For each recording with usable data, measurements were made to a selection table (see SWFSC-PAM-Sonobuoy-RavenPro-MeasurementPreset.ravenpreset in supplement folder in this repo) and three custom annotation columns were included (Start_End, Detection, Quality, following the SWFSC_PAM_Sonobuoy_Annotation_keymap.ravenpreset in the supplement folder in this repo).
 
-Effort was identified by a start effort (Start_End, Detection, Quality annotations of 1, 9, 9) at the beginning of the usable recording, and end of effort was identified (3, 9, 9) at the end of the usable effort. Bouts of noise were identified by a temporary end of the effort due to noise (end_noise, 3, 1, 9), and a restart after a bout of noise was annotated (start_noise, 1, 9, 9). Detections of potential biological sounds were identifed as a detection of a specific species (where Start_End = 9, Detection = species, and Quality = low/med/high). Selection tables were saved using the following naming format: Cruise#_RecordingID_YYMMDD_HHmm.Table1.selections.txt.
+Effort was identified by a start effort (Start_End, Detection, Quality annotations of 1, 9, 9) at the beginning of the usable recording, and end of effort was identified (3, 9, 9) at the end of the usable effort. Bouts of noise were identified within RavenPro by a temporary end of the effort due to noise (end_noise, 3, 1, 9), and a restart after a bout of noise was annotated (start_noise, 1, 9, 9). Detections of potential biological sounds were identifed as a detection of a specific species (where Start_End = 9, Detection = species, and Quality = low/med/high). Selection tables were saved using the following naming format: Cruise#_RecordingID_YYMMDD_HHmm.Table1.selections.txt.
 
 For mid-frequency review, recordings decimated to 4800 Hz were reviewed using RavenPro Software (v1.6.4). Page size = 60 seconds, 90% increment, 10% step increment. View only spectrogram (not waveform), 2 rows with 512 FFT with 200 Hz to 2400 Hz in window. For each recording with usable data, measurements were made to a selection table (see SWFSC-PAM-Sonobuoy-RavenPro-MeasurementPreset.ravenpreset in supplement folder in this repo) and three custom annotation columns were included (Start_End, Detection, Quality, following the SWFSC_PAM_Sonobuoy_Annotation_keymap.ravenpreset in the supplement folder in this repo).
 
-For low-frequency review....
+For low-frequency review....[have not yet done low frequency review]
 
 
+# Summary Table Prep
+Download google table and save as a dataframe for downstream processing
+
+# Data Prep
+## 1. Import-Merge-Modify Selection Tables
+
+```{r surveyDataprep}
+sb_survey <- read_csv(here("data/surveyData.csv")) %>%
+  clean_names()
+
+sb_review <- read.csv(here("data/swfsc_sonobuoy_manualReview.csv"))%>%
+  clean_names() 
+
+#Next, merge selection tables
+myPath <- "E:/brydes-sei/sb_d10_SelectionTables"#path for selection tables
+
+sb_raven <- merge_raven_tables(folder_path = myPath) 
+head(sb_raven)
+
+
+```
 
 
 # Effort
@@ -83,52 +104,6 @@ Cruise name, deploy ID, date/time, Sighting # & Species, Species w/in 10nmi or 2
 For each call type, give median and 10th, 90th percentiles for: duration of call (s), low frequency (Hz), high frequency (Hz), center frequency (Hz), peak frequency (Hz), delta frequency (Hz), and signal-to-noise ratio (dB). Where appropriate, give ICI and IPI.
 
 
-# Merge survey data and analysis to create a single sonobuoy data file (this should probably go into the _commonR.r file and saved??)
-```{r surveyDataprep}
-source(here::here("_code/_commonR.R"))
-library(Rraven)
-library(warbleR)
-
-surveyData <- read_csv(here("_data/surveyData.csv")) %>%
-  clean_names()
-
-review <- read.csv(here("_data/swfsc_sonobuoy_manualReview.csv"))%>%
-  clean_names() 
-#Next, merge these so that all the files in review have the important info (date, time, lat long,etc). Might need to be sure there is a specific ID column like CruiseNum_SBnum or something
-
-surveyBrydes <- xxx #subset this data to only include survey data where "Brydes" detections are TRUE
-  
-
-
-```
-
-Import/Merge/Modify Selection Tables
-```{r ravenDataprep}
-# List all your files
-myPath <- "W:/Sonobuoys/d10_SelectionTables"#path for selection tables
-
-list.files(path = myPath , pattern = "\\.txt$")  # List files in myPath
-
-
-# Import raven data (providing the name of the column with the sound file names) in format that accommodates warbleR functions. Note, if you want to work with the time series (in warblR), then add argument <waveform = TRUE>.
-d10 <- imp_raven(sound.file.col = "End.File", all.data = TRUE, ext.case = 'upper',
-                 name.from.file = TRUE, path = myPath) 
-#to work with warbleR, use d10w
-d10w <- imp_raven(sound.file.col = "End.File", all.data = TRUE, ext.case = 'upper',
-                     name.from.file = TRUE, warbler.format =  TRUE, path = myPath) 
-
-
-## If I want to extract time series for use in warbleR
-# create spectrograms and put them in a folder for review
-
-
-# can I use this to export wav files of selections with a buffer?
-
-# spectro-analysis in warbleR, can also measure harmonic features
-
-# cross-correlation-- pair-wise similarity of the sounds, might want to do to quantify sounds from different encounters. Gives a similarity matrix to see which sounds are more similar to each other.
 
 
 
-
-```
