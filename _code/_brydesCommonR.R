@@ -9,47 +9,44 @@ library(Rraven)
 library(dplyr)
 library(stringr)
 library(readr)
+library(clipr)
+library(sf)
+library(marmap)
+library(ggspatial)
 
 #Add general functions
 
 ################################
 # Merge Raven Selection Tables #
 ################################
-
+#merge all selection tables in myPath and use clean_names to format column names
 merge_raven_tables <- function(folder_path, time_zone = "UTC") {
   
-  # 1. Get a list of all selection table files in the directory
   file_list <- list.files(path = folder_path, pattern = "\\.selections\\.txt$", full.names = TRUE)
   
-  # Check if any files were actually found
   if (length(file_list) == 0) {
-    stop("No selection table files ending in '.selections.txt' were found in the specified directory.")
+    stop("No selection table files ending in '.selections.txt' were found.")
   }
   
-  # 2. Inner helper function to process a single file
   process_single_file <- function(file_path) {
     fname <- basename(file_path)
-    
-    # Split filename by "_"
     name_parts <- str_split(fname, "_")[[1]]
     
     cruise_num <- name_parts[1]
     dat_num    <- name_parts[2]
     date_str   <- name_parts[3]
-    time_str   <- name_parts[4]
-    
-    # Isolate just the 4-digit HHMM time
-    time_str   <- str_extract(time_str, "^\\d{4}")
+    time_str   <- str_extract(name_parts[4], "^\\d{4}")
     
     raw_datetime <- paste(date_str, time_str)
     
-    # Read the tab-delimited Raven file
     table_data <- read_delim(file_path, delim = "\t", show_col_types = FALSE)
     
-    # Return NULL safely if the file is completely empty
     if (nrow(table_data) == 0) return(NULL)
     
-    # Add metadata and convert to POSIXct
+    # Clean the names of THIS file FIRST before adding metadata
+    table_data <- table_data %>% clean_names()
+    
+    # Add metadata
     table_data <- table_data %>%
       mutate(
         filename = fname,
@@ -61,12 +58,8 @@ merge_raven_tables <- function(folder_path, time_zone = "UTC") {
     return(table_data)
   }
   
-  # 3. Use map_df to loop through files and bind them together
+  # map_df combines them cleanly, filling missing columns with NA
   merged_df <- map_df(file_list, process_single_file)
-  
-  # 4. Clean all column names to snake_case using janitor
-  merged_df <- merged_df %>% 
-    clean_names()
   
   return(merged_df)
 }
@@ -400,8 +393,8 @@ process_effort_analysis <- function(folder_path) {
     
     # Read and clean data
     df <- read_delim(file_path, delim = "\t", show_col_types = FALSE) %>%
-      clean_names()
-    
+      clean_names() 
+
     # Identify start_effort (first (1, 9, 9))
     start_effort <- df %>% 
       filter(start_end == 1, detection == 9, quality == 9) %>%
@@ -469,19 +462,112 @@ process_effort_analysis <- function(folder_path) {
   results_df <- bind_rows(results_list)
   
   # Save as RDS file
+  data_path <- here("data/")
   folder_name <- basename(normalizePath(folder_path))
   output_filename <- paste0(folder_name, "_effort.rds")
-  output_path <- file.path(folder_path, output_filename)
+  output_path <- file.path(data_path, output_filename)
   
   saveRDS(results_df, output_path)
   
   message(paste("Processed", nrow(results_df), "files successfully."))
-  message(paste("Results saved to:", output_path))
+  message(paste("Results saved to:", data_path))
   
   return(results_df)
 }
 
 # Example usage:
 # results <- process_effort_analysis("path/to/your/folder")
-# View(results)
+
+##################################
+# Merge and Validate Deployments #
+##################################
+#Append existing be_deploy, be_effort, and e_review tables (and look for obvious errors)
+merge_and_validate_deployments <- function(deploy_df, effort_df, be_review_df) {
+  library(dplyr)
+  
+  # 1. Force ID columns to numeric to prevent data type mismatch errors across ALL dataframes
+  deploy_df <- deploy_df %>%
+    dplyr::mutate(
+      cruise = as.numeric(cruise),
+      sonobuoy_number = as.numeric(sonobuoy_number)
+    )
+  
+  effort_df <- effort_df %>%
+    dplyr::mutate(
+      cruise = as.numeric(cruise),
+      sonobuoy_number = as.numeric(sonobuoy_number)
+    )
+  
+  be_review_df <- be_review_df %>%
+    dplyr::mutate(
+      cruise = as.numeric(cruise),
+      sonobuoy_number = as.numeric(sonobuoy_number)
+    )
+  
+  # 2. Perform the left joins sequentially
+  combined_df <- deploy_df %>%
+    dplyr::left_join(effort_df, by = c("cruise", "sonobuoy_number")) %>%
+    dplyr::left_join(be_review_df, by = c("cruise", "sonobuoy_number"))
+  
+  cat("\n--- RUNNING DIAGNOSTIC CHECKS ---\n")
+  
+  # 3. Check 1: deploy rows with NO matching effort
+  missing_effort <- combined_df %>%
+    dplyr::filter(is.na(recording_name)) %>%
+    dplyr::select(cruise, sonobuoy_number) %>%
+    dplyr::distinct()
+  
+  if (nrow(missing_effort) > 0) {
+    warning("The following deployment rows do not have an associated effort value:")
+    print(missing_effort)
+  } else {
+    message("✓ Success: All deployment rows have associated effort data.")
+  }
+  
+  # 4. Check 2: deploy rows with MULTIPLE matching effort rows
+  duplicate_effort_checks <- effort_df %>%
+    dplyr::group_by(cruise, sonobuoy_number) %>%
+    dplyr::tally() %>%
+    dplyr::filter(n > 1)
+  
+  if (nrow(duplicate_effort_checks) > 0) {
+    warning("The following cruise/sonobuoy combinations have multiple rows in effort (causes duplicate rows):")
+    print(duplicate_effort_checks)
+  } else {
+    message("✓ Success: No duplicate effort matches found.")
+  }
+  
+  # 5. Check 3: New Check for be_review mismatches
+  # (Assumes 'be_review_df' has a unique column name, replace 'status' below if needed)
+  # If you don't know a unique column, we check if the entire joined block from be_review is missing
+  missing_be_review <- combined_df %>%
+    dplyr::filter(is.na(recording_quality_code)) %>% # <-- Change 'status' to a column unique to be_review (e.g., 'reviewer', 'comments')
+    dplyr::select(cruise, sonobuoy_number) %>%
+    dplyr::distinct()
+  
+  if (nrow(missing_be_review) > 0) {
+    warning("The following deployment rows do not have an associated be_review value:")
+    print(missing_be_review)
+  } else {
+    message("✓ Success: All deployment rows have associated be_review data.")
+  }
+  
+  # 6. Check 4: deploy rows with MULTIPLE matching be_review rows
+  duplicate_be_checks <- be_review_df %>%
+    dplyr::group_by(cruise, sonobuoy_number) %>%
+    dplyr::tally() %>%
+    dplyr::filter(n > 1)
+  
+  if (nrow(duplicate_be_checks) > 0) {
+    warning("The following cruise/sonobuoy combinations have multiple rows in be_review (causes duplicate rows):")
+    print(duplicate_be_checks)
+  } else {
+    message("✓ Success: No duplicate be_review matches found.")
+  }
+  
+  cat("---------------------------------\n\n")
+  
+  # Return the fully merged dataframe
+  return(combined_df)
+}
 

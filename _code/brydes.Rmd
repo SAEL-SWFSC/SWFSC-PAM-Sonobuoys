@@ -6,7 +6,7 @@ output: html_document
 ```{r prep}
 library(here)
 here()
-source(here::here("_code/_commonR.R"))
+source(here::here("_code/_brydesCommonR.R"))
 
 ```
 # Manual Review and Annotation
@@ -26,34 +26,28 @@ Download google table and save as a dataframe for downstream processing
 ## 1. Import-Merge-Modify Selection Tables
 
 ```{r surveyDataprep}
-sb_survey <- read_csv(here("data/surveyData.csv")) %>%
-  clean_names()
 
-sb_review <- read.csv(here("data/swfsc_sonobuoy_manualReview.csv"))%>%
-  clean_names() 
+# TO Do:
+### --> Review 1623 #21, 24, 25 (humpbacks rule the day, but need to review for be500, label other bp as 'unknown')
+### --> For each sighting, identify the species included in that sighting (or nearby), and then create a column for 'be" to identify if any are present.
+### --> save each of the relevant R objects as dataframes in the data/ folder so I can skip this when I"m done
+### --> check all times to see if they are local, can I change them to UTC?? Note: I emailed Sam, but may need to use tmz=""
+### --> Clean up the code chunks (insert as much as possible into the functions)
 
-#Next, merge selection tables
-myPath <- "E:/brydes-sei/sb_d10_SelectionTables"#path for selection tables
+### sb_review
+# sonobuoy deployments that I reviewed manually
+be_review <- read.csv(here("data/swfsc_sonobuoy_manualReview.csv"))%>%
+  clean_names() %>%
+  rename(sonobuoy_number = deployment_id) %>% 
+  mutate(sonobuoy_number = as.numeric(sonobuoy_number))%>%
+  filter(`recording_quality_code` != "UNUSABLE")%>%
+  filter(!(cruise == 1621 & sonobuoy_number == 7))
+saveRDS(sb_review, file = here("data", "be_review.rds"))
 
-sb_raven <- merge_raven_tables(folder_path = myPath) 
-head(sb_raven)
 
-
-```
-
-
-# Effort
-For each selection file, first, review data and make sure all files pass an error check.
-
-Next Step:
-- Check each of the files with errors to see if I can fix each of these. Does it appear that the data check is working correctly? 
-- Once these are fixed, have chat GPT revise the overall function that checks for errors (stops if there is an error), and then creates the effort table.
-
-```{r brydesEffort_datacheck}
-library(tidyverse)
-library(janitor)
-library(lubridate)
-myPath <- "//SWC-CMAP2-N/pam3/Sonobuoys/sb_d10_SelectionTables"
+### sb_raven 
+# Validate and then merged selection tables
+myPath <- here("brydesData/")# 
 
 validation_results <- validate_effort_data(myPath)
 
@@ -63,32 +57,57 @@ if (validation_results$has_errors) {
   write_csv(validation_results$summary, "validation_summary.csv")
 }
 
+be_raven <- merge_raven_tables(folder_path = myPath) 
+
+saveRDS(be_raven, file = here("data", "be_raven.rds"))
+
+### sb_effort
+# process Raven Selection Tables for Effort Analysis
+myPath <- here("brydesData/")# 
+be_effort <- process_effort_analysis(myPath)
+    
+# Add sonobuoy_number column 
+be_effort <- be_effort %>%
+  dplyr::mutate(sonobuoy_number = as.numeric(str_remove(recording_name, "SBDAT"))) 
+saveRDS(be_effort, file = here("data", "be_effort.rds"))
+
+### sb_deploy 
+# ALL the deployments, then I filter them by the buoys that were reviewed
+be_deploy <- read_csv(here("data/surveyData.csv")) %>%
+  clean_names() %>%
+  dplyr::mutate(
+    cruise = as.numeric(cruise),
+    sonobuoy_number = as.numeric(sonobuoy_number)
+  ) %>% 
+  dplyr::semi_join(
+    sb_review %>% dplyr::mutate(
+      cruise = as.numeric(cruise),
+      sonobuoy_number = as.numeric(sonobuoy_number)
+    ), 
+    by = c("cruise", "sonobuoy_number")
+  ) 
+
+## merge and validate deployments
+brydes_df <- merge_and_validate_deployments(be_deploy, be_effort, be_review)
+
+saveRDS(brydes_df, file = here("data", "brydes_df.rds"))
+
 ```
-
-Estimate Effort (this currently estimates just for one folder, will ultimately want to create a table using both the low and the mid frequency analysis)
-```{r brydesEffort}
-
-#' Process Raven Selection Tables for Effort Analysis
-#'
-#' @param folder_path Path to folder containing Raven selection table text files
-#' @return A dataframe with effort metrics for each recording
-#' @export
-
-# Example usage:
-myPath <- "//SWC-CMAP2-N/pam3/Sonobuoys/sb_d10_SelectionTables"
-results <- process_effort_analysis(myPath)
-View(results)
-
-```
-
 
 
 # Brydes Map
 
-Map with bathymetry 
-- Small black dots for brydes whale detections 
-- Small yellow dots for brydes whale detections with calls
-- Small yellow stars for brydes whale detections with 500 Hz pulses 
+```{r map}
+source(here::here("_code/detection_map.R"))
+
+detection_df <- readRDS(here("data/brydes_df.rds"))
+output_name <- "brydes_detection_map"
+
+detection_map(detection_df, output_name, point_size = "auto",
+              padding_deg = 1, dpi = 300, fig_width = 10,
+              fig_height = 8, bathy_res = 0.25, keep_bathy = TRUE,
+               xlim = c(-180, -70), ylim = c(-10, 50))
+```
 
 # Table of deployments, good recording time, species deployed on, species within 10nmi or 2 hours
 
