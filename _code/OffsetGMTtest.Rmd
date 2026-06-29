@@ -1,0 +1,24 @@
+---
+title: "swfscDAS OffsetGMT Validation and Assessment Report"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: united
+params:
+  file_path: "C:/Users/shannon.rankin/Documents/GitHub/SWFSC-PAM-Sonobuoys/data/surveyData/Hawi1621.das"
+---
+
+To use this, change the filepath in the header of this file, and then click **Knit** to generate the report.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.width = 8, fig.height = 5)
+
+# Load required libraries
+library(swfscDAS)
+library(dplyr)
+library(lubridate)
+library(ggplot2)
+library(tidyr)
+library(sf)

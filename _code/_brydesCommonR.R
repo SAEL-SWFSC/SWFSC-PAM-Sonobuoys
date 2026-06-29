@@ -1,6 +1,7 @@
-# Load Libraries
+# Load Library
 library(here)
 library(tidyverse)
+library(tidyr)
 library(purrr)
 library(lubridate)
 library(janitor)
@@ -13,8 +14,225 @@ library(clipr)
 library(sf)
 library(marmap)
 library(ggspatial)
+library(gt)
+library(webshot2)
+library(patchwork)
+library(swfscDAS)
+library(lubridate)
+library(ggplot2)
 
-#Add general functions
+
+
+# Source Other Files
+source(here::here("_code/diurnal_polar_plot.R"))
+
+# =============================================================================
+# DataPrep: Add Sightings to Deploy
+# =============================================================================
+prep_deploy_data <- function(sightings_path, deploy_df, species_ids,
+                             output_path = NULL) {
+  
+  # 1. Load sightings from path; deploy is already a dataframe
+  sightings_raw <- read_csv(here(sightings_path), show_col_types = FALSE) %>%
+    clean_names()
+  
+  # 2. Clean and format deploy
+  deploy_clean <- deploy_df %>%
+    mutate(
+      cruise          = as.character(cruise),
+      sonobuoy_number = as.character(sonobuoy_number),
+      dat_number      = as.character(dat_tape_number),
+      date            = as.POSIXct(date,format = "%Y-%m-%dT%H:%M:%SZ",
+        tz = "")
+    )
+  
+  # 3. Clean and format sightings
+  sightings_clean <- sightings_raw %>%
+    mutate(
+      cruise           = as.character(cruise),
+      sonobuoy_number  = as.character(sonobuoy_number),
+      sighting_species = as.character(sighting_species),
+      near_species     = as.character(near_species)
+    )
+  
+  # 4. Get all cruise/sonobuoy combos present in sightings (for NA flagging)
+  sightings_combos <- sightings_clean %>%
+    select(cruise, sonobuoy_number) %>%
+    distinct() %>%
+    mutate(.in_sightings = TRUE)
+  
+  # 5. Loop over species_ids with purrr::reduce, adding one column per species
+  processed_deploy <- purrr::reduce(
+    as.character(species_ids),
+    .init = deploy_clean,
+    function(current_df, sp_id) {
+      
+      new_col_name <- paste0(sp_id, "_sightings")
+      
+      species_matches <- sightings_clean %>%
+        filter(sighting_species == sp_id | near_species == sp_id) %>%
+        select(cruise, sonobuoy_number) %>%
+        distinct() %>%
+        mutate(!!new_col_name := TRUE)
+      
+      current_df %>%
+        left_join(species_matches, by = c("cruise", "sonobuoy_number")) %>%
+        left_join(sightings_combos, by = c("cruise", "sonobuoy_number")) %>%
+        mutate(
+          !!new_col_name := case_when(
+            is.na(.in_sightings)          ~ NA,
+            .data[[new_col_name]] == TRUE ~ TRUE,
+            TRUE                          ~ FALSE
+          )
+        ) %>%
+        select(-.in_sightings)
+    }
+  )
+  
+  # 6. Optionally save to .rds
+  if (!is.null(output_path)) {
+    saveRDS(processed_deploy, file = here(output_path))
+    message("Output saved to: ", here(output_path))
+  }
+  
+  return(processed_deploy)
+}
+# =============================================================================
+# DataPrep: Manual Review
+# =============================================================================
+prep_manual_review <- function(review_path = "data/swfsc_sonobuoy_manualReview.csv", 
+                               output_path = "data/brydes/review.rds") {
+  
+  # 1. Load data safely using here() and clean initial names
+  review_raw <- read_csv(here(review_path), show_col_types = FALSE) %>% 
+    clean_names()
+  
+  # 2. Process data: rename, cast type, and filter
+  review <- review_raw %>%
+    rename(sonobuoy_number = deployment_id,
+           cruise = cruise_number) %>%
+    mutate(sonobuoy_number = as.numeric(sonobuoy_number),
+           dat_number = str_remove(folder_name, ".*SBDAT") %>% as.numeric()
+           ) %>%
+    filter(recording_quality_code != "UNUSABLE")
+  
+  # 3. Ensure the output directory exists before saving (defensive programming)
+  output_dir <- dirname(here(output_path))
+  if (!dir.exists(output_dir)) {
+    dir.create(output_dir, recursive = TRUE)
+  }
+  
+  # 4. Save as .rds
+  saveRDS(review, file = here(output_path))
+  
+  # Return the data frame invisibly in case you want to pipe it directly into something else
+  return(review)
+}
+# =============================================================================
+# DataPrep: Count True Annotations & Merge to Review dataframe
+# =============================================================================
+count_true_annotations <- function(review, raven, annotation_col) {
+  
+  true_values <- c("Y", "Yes", "T", "TRUE")
+  
+  raven_summary <- raven %>%
+    mutate(across(c(cruise, dat_number), as.character)) %>%   # <-- coerce
+    group_by(cruise, dat_number) %>%
+    summarise(
+      n_true       = sum(.data[[annotation_col]] %in% true_values, na.rm = TRUE),
+      n_total_rows = n(),
+      .groups = "drop"
+    )
+  
+  review %>%
+    mutate(across(c(cruise, dat_number), as.character)) %>%   # <-- coerce
+    left_join(raven_summary, by = c("cruise", "dat_number")) %>%
+    mutate(
+      !!annotation_col := case_when(
+        is.na(n_total_rows) ~ NA_integer_,
+        TRUE                ~ as.integer(n_true)
+      )
+    ) %>%
+    select(-n_true, -n_total_rows)
+}
+# =============================================================================
+# DataPrep: Merge Deploy & Review
+# =============================================================================
+merge_deploy_review <- function(deploy_df, review_df, remove_unmatched_deploy = FALSE) {
+  
+  # 0. Coerce cruise and dat_number to character in both dataframes
+  deploy_df <- deploy_df %>% mutate(across(c(cruise, dat_number), as.character))
+  review_df <- review_df %>% mutate(across(c(cruise, dat_number), as.character))
+  
+  # 1. Check for rows in review that do not exist in deploy
+  unmatched_reviews <- anti_join(review_df, deploy_df, by = c("cruise", "dat_number"))
+  
+  if (nrow(unmatched_reviews) > 0) {
+    examples <- unmatched_reviews %>% 
+      select(cruise, dat_number) %>% 
+      distinct() %>% 
+      head(5)
+    
+    example_string <- paste(capture.output(print(examples)), collapse = "\n")
+    
+    warning(paste0(
+      "Found ", nrow(unmatched_reviews), " row(s) in 'review' that do not exist in 'deploy'!\n",
+      "Showing the first few unmatched pairs:\n",
+      example_string
+    ))
+  }
+  
+  # 2. Merge dataframes based on user preference
+  if (remove_unmatched_deploy) {
+    merged_df <- inner_join(deploy_df, review_df, by = c("cruise", "dat_number"))
+  } else {
+    merged_df <- left_join(deploy_df, review_df, by = c("cruise", "dat_number"))
+  }
+  
+  return(merged_df)
+}
+
+# 
+# merge_deploy_review <- function(deploy_df, review_df, remove_unmatched_deploy = FALSE) {
+#   
+#   # 1. Check for rows in review that do not exist in deploy
+#   # anti_join finds rows in review that have no match in deploy based on cruise & dat_number
+#   unmatched_reviews <- anti_join(review_df, deploy_df, by = c("cruise", "dat_number"))
+#   
+#   if (nrow(unmatched_reviews) > 0) {
+#     # Isolate the unique combinations of unmatched cruise and dat_numbers
+#     examples <- unmatched_reviews %>% 
+#       select(cruise, dat_number) %>% 
+#       distinct() %>% 
+#       head(5)
+#     
+#     # Generate a clean, readable string of the mismatches
+#     example_string <- paste(capture.output(print(examples)), collapse = "\n")
+#     
+#     warning(paste0(
+#       "Found ", nrow(unmatched_reviews), " row(s) in 'review' that do not exist in 'deploy'!\n",
+#       "Showing the first few unmatched pairs:\n",
+#       example_string
+#     ))
+#   }
+#   
+#   # 2. Merge dataframes based on user preference
+#   if (remove_unmatched_deploy) {
+#     # Inner join drops any 'deploy' rows that don't match 'review'
+#     merged_df <- inner_join(deploy_df, review_df, by = c("cruise", "dat_number"))
+#   } else {
+#     # Left join keeps all 'deploy' rows, filling missing 'review' data with NA
+#     merged_df <- left_join(deploy_df, review_df, by = c("cruise", "dat_number"))
+#   }
+#   
+#   return(merged_df)
+# }
+
+# =============================================================================
+# DataPrep: Merge Validated Raven Files
+# =============================================================================
+
+
 
 ################################
 # Merge Raven Selection Tables #
@@ -52,7 +270,7 @@ merge_raven_tables <- function(folder_path, time_zone = "UTC") {
         filename = fname,
         cruise_number = cruise_num,
         dat_number = dat_num,
-        date_time = as.POSIXct(raw_datetime, format = "%y%m%d %H%M", tz = time_zone)
+        date = as.POSIXct(raw_datetime, format = "%y%m%d %H%M", tz = time_zone)
       )
     
     return(table_data)
@@ -570,4 +788,448 @@ merge_and_validate_deployments <- function(deploy_df, effort_df, be_review_df) {
   # Return the fully merged dataframe
   return(combined_df)
 }
+
+
+########################
+# Acoustic Violin Plot #
+########################
+create_acoustic_violin_plots <- function(data, hjust = -0.15, vjust = -0.5) {
+  
+  # 1. Clean, rename, and structure the long-format data variables
+  plot_data <- data %>%
+    dplyr::select(low_freq_hz, high_freq_hz, dur_90_percent_s) %>%
+    tidyr::pivot_longer(
+      cols = everything(),
+      names_to = "metric",
+      values_to = "value"
+    ) %>%
+    dplyr::mutate(metric = dplyr::recode_factor(
+      metric,
+      "low_freq_hz"       = "Low Frequency (Hz)",
+      "high_freq_hz"      = "High Frequency (Hz)",
+      "dur_90_percent_s"  = "Duration (s)"
+    ))
+  
+  # 2. Compute the exact medians dynamically per metric for geom_text
+  median_labels <- plot_data %>%
+    dplyr::group_by(metric) %>%
+    dplyr::summarise(
+      median_val = median(value, na.rm = TRUE),
+      # FIX: Extracting the scalar character explicitly forces a size of 1
+      label_text = case_when(
+        as.character(metric[1]) == "Duration (s)" ~ format(round(median_val, 2), nsmall = 2), 
+        TRUE                                      ~ format(round(median_val, 0), nsmall = 0)
+      )
+    )
+  
+  # 3. Split dataset and labels for Frequencies vs. Duration
+  freq_data   <- plot_data %>% dplyr::filter(metric %in% c("Low Frequency (Hz)", "High Frequency (Hz)"))
+  freq_labels <- median_labels %>% dplyr::filter(metric %in% c("Low Frequency (Hz)", "High Frequency (Hz)"))
+  
+  dur_data    <- plot_data %>% dplyr::filter(metric == "Duration (s)")
+  dur_labels  <- median_labels %>% dplyr::filter(metric == "Duration (s)")
+  
+  # 4. Shared theme settings
+  shared_theme <- theme_minimal(base_size = 13) +
+    theme(
+      legend.position = "none",
+      axis.title.x = element_blank(),
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      panel.grid.major.x = element_blank(),
+      strip.text = element_text(face = "bold", size = 11)
+    )
+  
+  # 5. Build Frequency Component
+  p_freq <- ggplot(freq_data, aes(x = metric, y = value, fill = metric)) +
+    geom_violin(alpha = 0.7, color = "black", linewidth = 0.5, quantiles = 0.5, quantile.linetype = "solid") +
+    geom_text(
+      data = freq_labels,
+      aes(x = metric, y = median_val, label = label_text),
+      inherit.aes = FALSE, 
+      fontface = "bold",
+      size = 3.5,
+      hjust = hjust,    
+      vjust = vjust     
+    ) +
+    scale_fill_manual(values = c("#B3CDE3", "#CCEBC5")) + 
+    facet_wrap(~ metric, scales = "fixed") + 
+    labs(y = "Frequency (Hz)") +
+    shared_theme
+  
+  # 6. Build Duration Component
+  p_dur <- ggplot(dur_data, aes(x = metric, y = value, fill = metric)) +
+    geom_violin(alpha = 0.7, color = "black", linewidth = 0.5, quantiles = 0.5, quantile.linetype = "solid") +
+    geom_text(
+      data = dur_labels,
+      aes(x = metric, y = median_val, label = label_text),
+      inherit.aes = FALSE,
+      fontface = "bold",
+      size = 3.5,
+      hjust = hjust,
+      vjust = vjust
+    ) +
+    scale_fill_manual(values = c("#DECBE4")) + 
+    facet_wrap(~ metric) + 
+    labs(y = "Duration (seconds)") +
+    shared_theme
+  
+  # 7. Layout composition
+  combined_plot <- (p_freq | p_dur) + 
+    plot_layout(widths = c(2, 1)) +
+    plot_annotation(title = "Distribution of Acoustic Features")
+  
+  return(combined_plot)
+}
+
+######################
+# Plot IPI Histogram #
+######################
+
+
+plot_ipi_histogram <- function(ipi_data, num_peaks = NULL) {
+  
+  # 1. Strip down to a completely clean, raw numeric vector
+  clean_ipi <- as.numeric(na.omit(ipi_data))
+  clean_ipi <- clean_ipi[is.finite(clean_ipi)]
+  
+  if(length(clean_ipi) == 0) stop("No valid numeric data found in ipi_data.")
+  df <- data.frame(IPI = clean_ipi)
+  
+  # 2. Find peaks using R's built-in density function
+  dens <- density(df$IPI)
+  
+  # Find local maxima (where density stops rising and starts falling)
+  shapes <- diff(sign(diff(dens$y)))
+  peak_indices <- which(shapes == -2) + 1
+  
+  # Extract the X-coordinates (IPI values) of the peaks
+  detected_peaks <- dens$x[peak_indices]
+  peak_densities <- dens$y[peak_indices]
+  
+  # Order peaks by how tall they are (most dominant peaks first)
+  peak_table <- data.frame(peak = detected_peaks, density = peak_densities) %>%
+    arrange(desc(density))
+  
+  # 3. Determine how many peaks to use
+  if (!is.null(num_peaks)) {
+    n <- min(num_peaks, nrow(peak_table))
+  } else {
+    # Automatically pick peaks that are at least 10% of the tallest peak's height
+    n <- sum(peak_table$density >= (max(peak_table$density) * 0.10))
+    n <- max(1, min(n, 3)) # Cap it between 1 and 3 peaks automatically
+  }
+  
+  final_peaks <- head(peak_table$peak, n)
+  
+  # 4. Calculate medians for data surrounding each peak
+  if (length(final_peaks) == 1) {
+    # Unimodal: Just use global median
+    peak_medians <- data.frame(Peak_ID = "Peak 1", Median_Val = median(df$IPI))
+  } else {
+    # Multimodal: Assign points to the closest peak to find peak-specific medians
+    final_peaks <- sort(final_peaks)
+    peak_medians <- df %>%
+      rowwise() %>%
+      mutate(Closest_Peak = which.min(abs(IPI - final_peaks))) %>%
+      ungroup() %>%
+      group_by(Closest_Peak) %>%
+      summarise(Median_Val = median(IPI), .groups = 'drop') %>%
+      mutate(Peak_ID = paste("Peak", seq_len(n())))
+  }
+  
+  # 5. Build the publication-ready ggplot
+  p <- ggplot(df, aes(x = IPI)) +
+    geom_histogram(aes(y = after_stat(density)), bins = 30, 
+                   fill = "white", color = "black", linewidth = 0.5) +
+    geom_density(color = "dimgray", linewidth = 0.8, linetype = "solid") +
+    geom_vline(data = peak_medians, aes(xintercept = Median_Val), 
+               color = "firebrick", linetype = "dashed", linewidth = 0.8) +
+    geom_text(data = peak_medians, 
+              aes(x = Median_Val, y = Inf, 
+                  label = paste0("Median: ", round(Median_Val, 3), "s")), 
+              vjust = 2, hjust = -0.1, color = "firebrick", fontface = "bold", size = 3.5) +
+    theme_classic(base_size = 14) +
+    theme(
+      axis.line = element_line(color = "black", linewidth = 0.8),
+      plot.title = element_text(face = "bold", hjust = 0.5),
+      axis.text = element_text(color = "black")
+    ) +
+    labs(
+      title = "Distribution of Inter-Pulse Intervals (IPI)",
+      x = "Inter-Pulse Interval (seconds)",
+      y = "Density"
+    )
+  
+  print(p)
+  return(peak_medians)
+}
+#####################
+# Create IPI Tables #
+#####################
+analyze_burst_ipi <- function(data, maxIPI) {
+  
+  # Step 2 & 3: Create IDs, sort, and calculate IPI based on center_time_s
+  processed_data <- data %>%
+    # 2. Create sonobuoy_ID
+    mutate(sonobuoy_ID = paste(cruise, dat_number, sep = "-")) %>%
+    # 3. Order rows by sonobuoy_ID (first) and date (second)
+    arrange(sonobuoy_ID, date) %>%
+    # Group by sonobuoy_ID so lead() doesn't accidentally pull from the next recording
+    group_by(sonobuoy_ID) %>%
+    # Measure time between current center_time_s and the next row's center_time_s
+    mutate(IPI = lead(center_time_s) - center_time_s) %>%
+    ungroup()
+  
+  # Step 4 & 5: Filter, calculate metrics, and summarize
+  summary_df <- processed_data %>%
+    # Remove NA values (the last row of each recording) for accurate counts/metrics
+    filter(!is.na(IPI)) %>%
+    group_by(sonobuoy_ID) %>%
+    summarise(
+      # Count how many IPIs exceed the user-defined maxIPI
+      exceeded_max_count = sum(IPI > maxIPI),
+      
+      # Calculate mean, median, and range EXCLUDING values over maxIPI
+      mean_IPI   = mean(IPI[IPI <= maxIPI], na.rm = TRUE),
+      median_IPI = median(IPI[IPI <= maxIPI], na.rm = TRUE),
+      
+      # Create the character string range (min - max) for valid values
+      range_IPI  = paste(
+        round(min(IPI[IPI <= maxIPI], na.rm = TRUE), 4), 
+        round(max(IPI[IPI <= maxIPI], na.rm = TRUE), 4), 
+        sep = " - "
+      ),
+      .groups = "drop"
+    ) %>%
+    # If a sonobuoy had NO values under maxIPI, replace NaN/Inf text with NA
+    mutate(range_IPI = if_else(grepl("Inf|NaN", range_IPI), NA_character_, range_IPI))
+  
+  return(summary_df)
+}
+
+#######################
+# add offsetGMT value #
+#######################
+# =============================================================================
+# FUNCTION 1: Process .das files and add offsetGMT column to brydes_df
+# =============================================================================
+
+add_offset_gmt <- function(df, das_dir = here("data/surveyData")) {
+  
+  # --- Step 1: Find all .das files and process/cache as .rds ---
+  das_files <- list.files(das_dir, pattern = "\\.das$", 
+                          full.names = TRUE, ignore.case = TRUE)
+  
+  if (length(das_files) == 0) {
+    warning("No .das files found in: ", das_dir)
+    return(df %>% mutate(offsetGMT = NA_character_))
+  }
+  
+  message("Processing ", length(das_files), " .das file(s)...")
+  
+  das_cache <- map(das_files, function(das_path) {
+    
+    rds_path <- sub("\\.das$", ".rds", das_path, ignore.case = TRUE)
+    
+    # Load cached RDS if it exists, otherwise process and save
+    if (file.exists(rds_path)) {
+      message("  Loading cached RDS: ", basename(rds_path))
+      processed <- readRDS(rds_path)
+    } else {
+      message("  Processing: ", basename(das_path))
+      raw       <- das_read(das_path)
+      processed <- das_process(raw)
+      saveRDS(processed, rds_path)
+      message("  Saved RDS: ", basename(rds_path))
+    }
+    
+    list(filename = basename(das_path), data = processed)
+  })
+  
+  # --- Step 2: For each row in df, find matching RDS and determine offsetGMT ---
+  
+  get_offset_for_row <- function(cruise_val, date_val) {
+    
+    # Find the cached dataset whose filename contains the cruise number
+    match_idx <- detect_index(das_cache, function(x) {
+      grepl(as.character(cruise_val), x$filename, fixed = TRUE)
+    })
+    
+    if (match_idx == 0) {
+      warning("No .das file found containing cruise: ", cruise_val)
+      return(NA_character_)
+    }
+    
+    das_data <- das_cache[[match_idx]]$data
+    
+    # Ensure DateTime and OffsetGMT columns exist
+    if (!all(c("DateTime", "OffsetGMT") %in% names(das_data))) {
+      warning("Required columns (DateTime, OffsetGMT) not found for cruise: ", 
+              cruise_val)
+      return(NA_character_)
+    }
+    
+    # # Define ±24 hr window around the row's date
+    # window_start <- date_val - dhours(24)
+    # window_end   <- date_val + dhours(24)
+    # Define ±6 hr window around the row's date
+    window_start <- date_val - dhours(1)
+    window_end   <- date_val + dhours(1)
+    
+    window_data <- das_data %>%
+      filter(!is.na(OffsetGMT),
+             DateTime >= window_start,
+             DateTime <= window_end)
+    
+    if (nrow(window_data) == 0) {
+      warning("No DAS records within ±24 hrs for cruise ", cruise_val, 
+              " around ", date_val)
+      return(NA_character_)
+    }
+    
+    unique_offsets <- unique(window_data$OffsetGMT)
+    
+    if (length(unique_offsets) == 1) {
+      # Stable offset — return as character (can be coerced later)
+      return(as.character(unique_offsets))
+    } else {
+      return("CHANGE")
+    }
+  }
+  
+  # Apply row-wise
+  message("Determining offsetGMT for ", nrow(df), " row(s)...")
+  
+  df <- df %>%
+    mutate(
+      offsetGMT = map2_chr(
+        cruise, date,
+        ~ get_offset_for_row(cruise_val = .x, date_val = .y)
+      )
+    )
+  
+  n_change <- sum(df$offsetGMT == "CHANGE", na.rm = TRUE)
+  n_na     <- sum(is.na(df$offsetGMT))
+  n_ok     <- nrow(df) - n_change - n_na
+  
+  message(
+    "offsetGMT summary:\n",
+    "  Stable offsets: ", n_ok, "\n",
+    "  CHANGE flags:   ", n_change, "\n",
+    "  NAs (no match): ", n_na
+  )
+  
+  df
+}
+
+
+# =============================================================================
+# FUNCTION 2: Convert 'date' to 'date_UTC' using 'offsetGMT'
+# =============================================================================
+
+add_date_utc <- function(df) {
+  
+  if (!all(c("date", "offsetGMT") %in% names(df))) {
+    stop("df must contain 'date' and 'offsetGMT' columns. ",
+         "Run add_offset_gmt() first.")
+  }
+  
+  df <- df %>%
+    mutate(
+      date_UTC = case_when(
+        is.na(offsetGMT)          ~ NA_POSIXct_,
+        offsetGMT == "CHANGE"     ~ NA_POSIXct_,
+        TRUE ~ {
+          offset_hours <- as.numeric(offsetGMT)
+          # Local time = UTC + offset, so UTC = local - offset
+          date - dhours(offset_hours)
+        }
+      )
+    )
+  
+  n_converted <- sum(!is.na(df$date_UTC))
+  n_na        <- sum(is.na(df$date_UTC))
+  
+  message(
+    "date_UTC summary:\n",
+    "  Successfully converted: ", n_converted, "\n",
+    "  Left as NA:             ", n_na, 
+    " (CHANGE flags or missing offsetGMT)"
+  )
+  
+  df
+}
+
+
+# =============================================================================
+# USAGE
+# =============================================================================
+
+# Step 1 — adds offsetGMT; review CHANGE rows before proceeding
+#brydes_df <- brydes_df %>% add_offset_gmt()
+
+# Optional: inspect rows needing manual review
+#brydes_df %>% filter(offsetGMT == "CHANGE" | is.na(offsetGMT)) %>% View()
+
+# Step 2 — convert to UTC once you're satisfied with offsetGMT values
+#brydes_df <- brydes_df %>% add_date_utc()
+
+#######################
+# Combine Survey Data #
+#######################
+combine_survey_data <- function(
+    input_dir = here("data", "surveyData"),
+    output_file = here("data", "surveyData.csv"),
+    keep_date_raw = FALSE
+) {
+  
+  parse_survey_date <- function(x) {
+    coalesce(
+      as.POSIXct(x, format = "%Y-%m-%d %H:%M:%S"),
+      as.POSIXct(x, format = "%m/%d/%Y %H:%M"),
+      as.POSIXct(x, format = "%m/%d/%Y %H:%M:%S"),
+      as.POSIXct(x, format = "%Y-%m-%d"),
+      as.POSIXct(x, format = "%m/%d/%Y")
+    )
+  }
+  
+  csv_files <- list.files(
+    path = input_dir,
+    pattern = "\\.csv$",
+    full.names = TRUE
+  )
+  
+  survey_data <- csv_files %>%
+    purrr::map_dfr(~ {
+      
+      dat <- readr::read_csv(
+        .x,
+        col_types = readr::cols(.default = readr::col_character()),
+        show_col_types = FALSE
+      ) %>%
+        janitor::clean_names()
+      
+      if ("date" %in% names(dat)) {
+        dat <- dat %>%
+          mutate(
+            date_raw = date,
+            date = parse_survey_date(date)
+          )
+      }
+      
+      dat
+    })
+  
+  # Drop date_raw if not requested
+  if (!keep_date_raw && "date_raw" %in% names(survey_data)) {
+    survey_data <- survey_data %>%
+      select(-date_raw)
+  }
+  
+  readr::write_csv(survey_data, output_file)
+  
+  survey_data
+}
+
 
