@@ -1025,8 +1025,19 @@ create_acoustic_violin_plots <- function(data, hjust = -0.15, vjust = -0.5) {
   freq_data   <- plot_data %>% dplyr::filter(metric %in% c("Low Frequency (Hz)", "High Frequency (Hz)"))
   freq_labels <- median_labels %>% dplyr::filter(metric %in% c("Low Frequency (Hz)", "High Frequency (Hz)"))
   
-  dur_data    <- plot_data %>% dplyr::filter(metric == "Duration (s)")
-  dur_labels  <- median_labels %>% dplyr::filter(metric == "Duration (s)")
+  dur_data <- plot_data %>% dplyr::filter(metric == "Duration (s)")
+  dur_density <- stats::density(dur_data$value[is.finite(dur_data$value)])
+  peak_indices <- which(diff(sign(diff(dur_density$y))) == -2) + 1
+  dur_peaks <- data.frame(
+    peak_val = dur_density$x[peak_indices],
+    peak_density = dur_density$y[peak_indices]
+  ) %>%
+    dplyr::slice_max(peak_density, n = 2, with_ties = FALSE) %>%
+    dplyr::arrange(peak_val) %>%
+    dplyr::mutate(
+      metric = factor("Duration (s)", levels = levels(plot_data$metric)),
+      label_text = paste0(format(round(peak_val, 2), nsmall = 2), " s")
+    )
   
   # 4. Shared theme settings
   shared_theme <- theme_minimal(base_size = 13) +
@@ -1058,26 +1069,38 @@ create_acoustic_violin_plots <- function(data, hjust = -0.15, vjust = -0.5) {
     shared_theme
   
   # 6. Build Duration Component
-  p_dur <- ggplot(dur_data, aes(x = metric, y = value, fill = metric)) +
-    geom_violin(alpha = 0.7, color = "black", linewidth = 0.5, quantiles = 0.5, quantile.linetype = "solid") +
+  p_dur <- ggplot(dur_data, aes(x = value, y = metric, fill = metric)) +
+    geom_violin(alpha = 0.7, color = "black", linewidth = 0.5, orientation = "y") +
+    geom_vline(
+      data = dur_peaks,
+      aes(xintercept = peak_val),
+      inherit.aes = FALSE,
+      linewidth = 0.5
+    ) +
     geom_text(
-      data = dur_labels,
-      aes(x = metric, y = median_val, label = label_text),
+      data = dur_peaks,
+      aes(x = peak_val, y = metric, label = label_text),
       inherit.aes = FALSE,
       family = "serif",
       fontface = "bold",
       size = 3.5,
-      hjust = hjust,
-      vjust = vjust
+      vjust = -1
     ) +
     scale_fill_manual(values = c("#DECBE4")) + 
     facet_wrap(~ metric) + 
-    labs(y = "Duration (seconds)") +
-    shared_theme
+    labs(x = "Duration (seconds)", y = NULL) +
+    shared_theme +
+    theme(
+      axis.title.x = element_text(),
+      axis.text.x = element_text(),
+      axis.ticks.x = element_line(),
+      axis.text.y = element_blank(),
+      axis.ticks.y = element_blank()
+    )
   
   # 7. Layout composition
-  combined_plot <- (p_freq | p_dur) + 
-    plot_layout(widths = c(2, 1)) 
+  combined_plot <- (p_freq / p_dur) +
+    plot_layout(heights = c(2, 1))
     # plot_annotation(title = "Distribution of Acoustic Features")
   
   return(combined_plot)
@@ -1333,4 +1356,3 @@ plot_ipi_histogram <- function(ipi_data, num_peaks = NULL) {
 # 
 # # Step 2 — convert to UTC once you're satisfied with offsetGMT values
 # #brydes_df <- brydes_df %>% add_date_utc()
-
