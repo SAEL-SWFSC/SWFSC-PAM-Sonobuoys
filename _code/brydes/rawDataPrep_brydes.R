@@ -4,23 +4,35 @@
 
 library(here)
 here()
-source(here::here("_code/_brydesCommonR.R"))
-
-# Only run if needed
+source(here::here("_code/brydes/_brydesCommonR.R"))
 
 ### DEPLOY ###
-survey_data <- combine_survey_data(keep_date_raw = FALSE) #Combine survey data all *.csv files in data/surveyData folder
+source(here("_code/merge_sonobuoy_csv.R"))
+survey_data <- merge_sonobuoy_csv(input_dir = here("data/surveyData"), output_file = here("data/surveyData.csv"))
 
 sightings_path = "data/brydes/sightings.csv"
-deploy_path = read.csv(here("data/surveyData.csv"))
+deploy_df = read.csv(here("data/surveyData.csv"))
 output_path = "data/brydes/deploy.rds"
 
 deploy <- prep_deploy_data(
   sightings_path, 
-  deploy_path,
+  deploy_df,
   output_path,
-  species_ids = "72"
+  species_ids = c("72", "99"),
+  strict_check = FALSE #does a strict check and fails if ANY deploy rows do not have an associated sightings row
 )
+
+## TEMP TESTING OF DATES
+#source(here("_code/compare_dates.R"))
+
+# Basic call (assumes column is named "date")
+#result <- compare_dates(deploy, survey_data)
+#result
+# With a custom column name and meaningful labels
+# result <- compare_dates(df1, df2,
+#                         date_col = "Date",
+#                         df1_name = "cruise_1631",
+#                         df2_name = "cruise_1616")
 
 ### REVIEW ###
 
@@ -31,7 +43,7 @@ review <- prep_manual_review(
 
 
 ### RAVEN ###
-source(here::here("_code/raven_selection_tables.R"))
+source(here::here("_code/brydes/raven_selection_tables.R"))
 
 raven_results <- validate_merge_raven(
   folder_path    = here("brydesData/"),

@@ -36,7 +36,7 @@ process_effort_analysis <- function(
     recording_start <- as.POSIXct(
       sprintf("%04d-%02d-%02d %02d:%02d:00", year, month, day, hour, min),
       format = "%Y-%m-%d %H:%M:%S",
-      tz     = ""
+      tz     = "UTC"
     )
     
     # Read and clean file

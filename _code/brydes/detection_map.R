@@ -80,20 +80,24 @@ detection_map <- function(
     detection_df,
     output_name,
     species,                              # named list — see above
-    point_size         = "auto",
-    padding_deg        = 1,
-    xlim               = NULL,
-    ylim               = NULL,
-    label_sighting     = "w/ sighting",
-    label_no_sighting  = "acoustic only",
-    label_not_detected = "Not detected",
-    show_not_detected  = TRUE,
-    legend_title       = "Detection",
-    dpi                = 300,
-    fig_width          = 10,
-    fig_height         = 8,
-    bathy_res          = 1,
-    keep_bathy         = TRUE
+    point_size                 = "auto",
+    padding_deg                = 1,
+    xlim                       = NULL,
+    ylim                       = NULL,
+    label_sighting              = "w/ sighting",
+    label_no_sighting           = "acoustic only",
+    label_not_detected          = "No detections",
+    label_not_detected_sighting = "No detections w/ Bryde's sighting",
+    show_not_detected           = TRUE,
+    legend_title                = "Detection",
+    dpi                         = 300,
+    fig_width                   = 10,
+    fig_height                  = 8,
+    plot_margin                 = c(2, 2, 2, 2),  # top,right,bottom,left in mm
+    font_family                 = "Times New Roman",
+    font_size                   = 12,
+    bathy_res                   = 1,
+    keep_bathy                  = TRUE
 ) {
 
   # ---- 0. Validate species list --------------------------------------------
@@ -225,28 +229,26 @@ detection_map <- function(
   pt_stroke <- max(0.4, pt_size * 0.15)
 
   # ---- 5. Build rendering table --------------------------------------------
-  # Each row = one species × detection × sighting combination.
-  # We expand all combinations per species, then look up the data rows.
+  # Logic:
+  #  - For EACH species: detected rows get two sub-groups (w/ sighting,
+  #    acoustic only), rendered in that species' colour.
+  #  - "Not detected" is computed ONCE across ALL species combined (a row is
+  #    only "not detected" if it was not detected by ANY species), avoiding
+  #    duplicate legend entries and duplicate overlapping circles per species.
 
-  # Legend key definition (one row per visible legend entry)
-  # Columns: grp_id, label, fill_color, shape, sp_name
-  legend_rows <- list()
-  # Rendering layers (list of geom_point calls)
+  legend_rows   <- list()
   render_layers <- list()
 
+  # Classify every species first so we can compute the combined "not
+  # detected by any species" group afterwards.
+  sp_classified <- list()
   for (sp in names(species)) {
-    entry    <- species[[sp]]
-    sp_color <- entry$color
-    sp_label <- entry$label
-    det_col  <- entry$detected
-    sig_col  <- entry$sighting
-
-    # Classify rows for this species
-    # threshold: if supplied, detected = (value > threshold); default 0 for
-    # numeric columns (any value > 0 = TRUE), ignored for logical columns
+    entry      <- species[[sp]]
+    det_col    <- entry$detected
+    sig_col    <- entry$sighting
     det_thresh <- if (!is.null(entry$threshold)) entry$threshold else 0
 
-    sp_df <- detection_df %>%
+    sp_classified[[sp]] <- detection_df %>%
       mutate(
         .detected = {
           raw <- .data[[det_col]]
@@ -258,63 +260,92 @@ detection_map <- function(
         .detected = replace_na(.detected, FALSE),
         .sighting = replace_na(.sighting, FALSE)
       )
+  }
 
-    # Four possible sub-groups
-    sub_groups <- list(
-      list(id      = paste0(sp, ".det.sight"),
-           label   = paste0(sp_label, " — detected, ", label_sighting),
-           fill    = sp_color,
-           shape   = 24L,     # triangle = sighting
-           filter  = quote(.detected == TRUE  & .sighting == TRUE)),
-      list(id      = paste0(sp, ".det.nosight"),
-           label   = paste0(sp_label, " — detected, ", label_no_sighting),
-           fill    = sp_color,
-           shape   = 21L,     # circle = no sighting
-           filter  = quote(.detected == TRUE  & .sighting == FALSE)),
-      list(id      = paste0(sp, ".nodet.sight"),
-           label   = paste0(sp_label, " — ", label_not_detected, ", ", label_sighting),
-           fill    = NA_character_,
-           shape   = 24L,
-           filter  = quote(.detected == FALSE & .sighting == TRUE)),
-      list(id      = paste0(sp, ".nodet.nosight"),
-           label   = paste0(sp_label, " — ", label_not_detected),
-           fill    = NA_character_,
-           shape   = 21L,
-           filter  = quote(.detected == FALSE & .sighting == FALSE))
+  # --- Detected sub-groups: one pair (sighting / acoustic only) per species -
+  for (sp in names(species)) {
+    entry    <- species[[sp]]
+    sp_color <- entry$color
+    sp_label <- entry$label
+    sp_df    <- sp_classified[[sp]]
+
+    det_sub_groups <- list(
+      list(id     = paste0(sp, ".det.sight"),
+           label  = paste0(sp_label, " detected, ", label_sighting),
+           fill   = sp_color,
+           shape  = 24L,
+           filter = quote(.detected == TRUE & .sighting == TRUE)),
+      list(id     = paste0(sp, ".det.nosight"),
+           label  = paste0(sp_label, " detected, ", label_no_sighting),
+           fill   = sp_color,
+           shape  = 21L,
+           filter = quote(.detected == TRUE & .sighting == FALSE))
     )
 
-    for (sg in sub_groups) {
-      # Skip "not detected" entries from legend if show_not_detected = FALSE
-      is_not_detected <- grepl("nodet", sg$id)
-      if (is_not_detected && !show_not_detected) next
-
+    for (sg in det_sub_groups) {
       rows <- sp_df %>% filter(!!sg$filter)
-      if (nrow(rows) == 0) next   # skip empty groups entirely
+      if (nrow(rows) == 0) next
 
-      # Rendering layer
       render_layers[[sg$id]] <- geom_point(
-        data   = rows,
-        aes(x = longitude, y = latitude),
-        shape  = sg$shape,
-        fill   = sg$fill,
-        color  = "black",
-        size   = pt_size,
-        stroke = pt_stroke,
-        na.rm  = TRUE
+        data = rows, aes(x = longitude, y = latitude),
+        shape = sg$shape, fill = sg$fill, color = "black",
+        size = pt_size, stroke = pt_stroke, na.rm = TRUE
       )
-
-      # Legend entry
       legend_rows[[sg$id]] <- tibble(
-        grp_id  = sg$id,
-        label   = sg$label,
-        fill    = sg$fill,
-        shape   = sg$shape
+        grp_id = sg$id, label = sg$label, fill = sg$fill, shape = sg$shape
       )
     }
   }
 
-  # Assemble legend data frame (order: detected-sighting, detected-nosighting,
-  # nodet-sighting, nodet-nosighting, within each species in species order)
+  # --- Combined "not detected" group (single set, shared across species) ---
+  if (show_not_detected) {
+    # A row counts as "not detected (by any species)" only if .detected is
+    # FALSE for every species. Sighting status also combined with OR.
+    not_det_any <- detection_df %>% mutate(.rowid = row_number())
+    det_flags   <- sapply(sp_classified, function(d) d$.detected)
+    sight_flags <- sapply(sp_classified, function(d) d$.sighting)
+    if (is.null(dim(det_flags))) {   # single species => sapply returns vector
+      det_flags   <- matrix(det_flags,   ncol = 1)
+      sight_flags <- matrix(sight_flags, ncol = 1)
+    }
+    not_det_any$.detected <- rowSums(det_flags) == 0       # not detected by ANY
+    not_det_any$.sighting <- rowSums(sight_flags) > 0       # sighted by ANY
+
+    no_det_sub_groups <- list(
+      list(id     = "nodet.sight",
+           label  = label_not_detected_sighting,
+           fill   = NA_character_,
+           shape  = 24L,
+           filter = quote(.detected == TRUE & .sighting == TRUE)),
+      list(id     = "nodet.nosight",
+           label  = label_not_detected,
+           fill   = NA_character_,
+           shape  = 21L,
+           filter = quote(.detected == TRUE & .sighting == FALSE))
+    )
+    # (Note: .detected == TRUE here means "qualifies as not-detected-by-any",
+    #  i.e. the recoded flag above — kept as TRUE/FALSE for filter reuse.)
+
+    for (sg in no_det_sub_groups) {
+      rows <- not_det_any %>% filter(!!sg$filter)
+      if (nrow(rows) == 0) next
+
+      render_layers[[sg$id]] <- geom_point(
+        data = rows, aes(x = longitude, y = latitude),
+        shape = sg$shape, fill = sg$fill, color = "black",
+        size = pt_size, stroke = pt_stroke, na.rm = TRUE
+      )
+      legend_rows[[sg$id]] <- tibble(
+        grp_id = sg$id, label = sg$label, fill = sg$fill, shape = sg$shape
+      )
+    }
+    # Put "not detected" entries FIRST in the legend
+    legend_rows <- c(legend_rows[grepl("^nodet", names(legend_rows))],
+                     legend_rows[!grepl("^nodet", names(legend_rows))])
+    render_layers <- c(render_layers[grepl("^nodet", names(render_layers))],
+                       render_layers[!grepl("^nodet", names(render_layers))])
+  }
+
   legend_df <- bind_rows(legend_rows) %>%
     mutate(grp_id = factor(grp_id, levels = grp_id))  # preserve order
 
@@ -397,7 +428,7 @@ detection_map <- function(
       style    = north_arrow_fancy_orienteering()
     ) +
 
-    theme_bw(base_size = 12) +
+    theme_bw(base_size = font_size, base_family = font_family) +
     theme(
       axis.title        = element_blank(),
       panel.grid.major  = element_line(color = "white", linewidth = 0.3,
@@ -408,7 +439,8 @@ detection_map <- function(
       legend.title      = element_text(face = "bold", size = 10),
       legend.text       = element_text(size = 9),
       legend.position   = "right",
-      plot.margin       = margin(5, 5, 5, 5)
+      plot.margin       = margin(plot_margin[1], plot_margin[2],
+                                  plot_margin[3], plot_margin[4], unit = "mm")
     )
 
   # ---- 7. Save -------------------------------------------------------------

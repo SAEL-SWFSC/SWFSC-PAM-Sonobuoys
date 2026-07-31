@@ -266,7 +266,7 @@ validate_merge_raven <- function(
             dat_number = as.numeric(str_remove(parts[2], "SBDAT")),
             date            = as.POSIXct(paste(date_str, time_str),
                                          format = "%y%m%d %H%M",
-                                         tz     = time_zone)
+                                         tz     = "UTC")
           )
       }
       

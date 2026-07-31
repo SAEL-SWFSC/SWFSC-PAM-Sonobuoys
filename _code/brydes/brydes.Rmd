@@ -3,13 +3,13 @@ title: "Brydes Data Analysis"
 output: html_document
 ---
 
-```{r prep}
+```{r prep results="hide"}
 library(here)
 here()
-source(here::here("_code/_brydesCommonR.R"))
+source(here::here("_code/brydes/_brydesCommonR.R"))
 
 #Only run if you NEED to rerun the raw data for deploy, review, raven, raven_effort fields
-source(here::here("_code/rawDataPrep_brydes.R")) 
+#source(here::here("_code/brydes/rawDataPrep_brydes.R")) 
 
 ```
 # Manual Review and Annotation
@@ -56,45 +56,38 @@ review <- merge_deploy_review(review, raven_effort, remove_unmatched_deploy = FA
 # 4 1635   40
 
 
-## merge deploy & review
-###PROBLEM: There are five dat_number (recordings) that are not in 'deploy', because deploy is by buoy, and review is by recording
-### How to fix? Maybe do not do it?!?
-# deploy_review <- merge_deploy_review(deploy, review, remove_unmatched_deploy = TRUE)
-# 
-# # Merge 
-# brydes <- deploy %>%
-#   mutate(cruise = as.numeric(cruise)) %>%
-#   right_join(
-#     review_effort %>% mutate(cruise = as.numeric(cruise)),
-#     by     = c("cruise", "dat_number"),
-#     suffix = c(".deploy", ".review_effort")
-#   )
-# 
-# write_csv(brydes, file = here("data/brydes", "brydes.csv"))
 
-#Merge Raven Effort with review
-# review_effort <- review %>%
-#   mutate(cruise = as.numeric(cruise)) %>%
-#   left_join(
-#     raven_effort %>% mutate(cruise = as.numeric(cruise)),
-#     by     = c("cruise", "dat_number"),
-#     suffix = c(".review", ".raven_effort")
-#   )
-# write_csv(review_effort, file = here("data/brydes", "review_effort.csv"))
-# 
-# # Flag any review_effort rows with no match in deploy
-# unmatched <- review_effort %>%
-#   anti_join(deploy, by = c("cruise", "dat_number"))
-# 
-# if (nrow(unmatched) > 0) {
-#   message("WARNING: ", nrow(unmatched), " row(s) in review_effort have no match in deploy:")
-#   unmatched %>%
-#     select(cruise, dat_number) %>%
-#     print()
-# }
+# Flag any review_effort rows with no match in deploy
+unmatched <- review %>%
+  anti_join(deploy, by = c("cruise", "dat_number"))
+
+if (nrow(unmatched) > 0) {
+  message("WARNING: ", nrow(unmatched), " row(s) in review_effort have no match in deploy:")
+  unmatched %>%
+    select(cruise, dat_number) %>%
+    print()
+}
+# Each of these, below, were additional recordings (tapes) for a sonobuoy/site
+# WARNING: 7 row(s) in review_effort have no match in deploy:
+# # A tibble: 7 × 2
+#   cruise dat_number
+#   <chr>  <chr>     
+# 1 1621   4         
+# 2 1621   9         
+# 3 1621   13        
+# 4 1629   5         
+# 5 1629   6         
+# 6 1629   8         
+# 7 1631   35  
+```
+## RETURN TO FIX THIS!! ##
+
+``` {r testTime}
+source(here("_code/brydes/compare_dates.R"))
+result <- compare_dates(deploy, survey_data)
+result
 
 ```
-
 #OffsetGMT
 The times provided in the raw datasets are 'local time', which is not related to longitude/time zones, but rather they are a 'floating' local time to the ship. The ship would shift the clock (effectively change time zones) according to sun/meal times. These times were also not always changed immediately (there are notes in some das files, 'oops, forgot to change the time'). Also, the GMT offset saved in the original DAS files is inverted, and it is extra confusing near the date line (HICEAS surveys, at the least). The swfscDAS R package has a script to identify the OffsetGMT for each line, but there are some issues where it  may not be calculated (eg, near the date line). See here for more info: https://swfsc.github.io/swfscDAS/articles/swfscDAS.html#read-and-process-data.
 
@@ -129,22 +122,22 @@ brydes_df <- brydes_df%>% add_date_utc()
 
 
 
-# Brydes Map
+# Detection Map
 
-```{r map}
-source(here::here("_code/detection_map.R"))
+```{r map results='hide'}
+source(here::here("_code/brydes/detection_map.R"))
 detection_df <- merge_deploy_review(deploy, review, remove_unmatched_deploy = TRUE)
 #Note: 7 rows in 'review' that do not exist in 'deploy', because those had multiple reviewed tapes per deployed buoy
 
 detection_map(
   detection_df,
-  output_name = "brydes_both",
+  output_name = "brydes/brydes_map",
   species = list(
     `Any Bryde's call` = list(
       detected = "be",
       sighting = "72_sightings",
       color    = "#FB8C00",
-      label    = "Any Bryde's call"
+      label    = "Bryde's MF Calls"
     ),
     `500 Hz calls` = list(
       detected  = "be500",
@@ -156,36 +149,90 @@ detection_map(
   ),
   show_not_detected = TRUE,
   padding_deg        = 4,
-    legend_title      = "Bryde's Whale Detections",
-  label_sighting     = "w/ visual sighting",
-  label_no_sighting  = "acoustic only",
-  label_not_detected = "Not detected"
+  legend_title      = "Recordings",
+  label_sighting     = "Bryde's sighting",
+  label_no_sighting  = "Acoustic only",
+  label_not_detected = "No Acoustic Detections"
 )
-# # Two species — custom colours, labels, restricted extent
-# detection_map(
-#   detection_df,
-#   output_name = "survey_detections",
-#   species = list(
-#     Brydes = list(detected  = "be500",
-#                  sighting   = "brydes_sighting",
-#                  color      = "#E63946",
-#                  label      = "Bryde's whale"),
-#     Blue   = list(detected  = "blue_det",
-#                  sighting   = "blue_sighting",
-#                  color      = "#457B9D",
-#                  label      = "Blue whale")
-#   ),
-#   xlim               = c(-180, -130),
-#   ylim               = c(15,    50),
-#   label_sighting     = "w/ visual",
-#   label_no_sighting  = "acoustic only",
-#   label_not_detected = "Not detected",
-#   show_not_detected  = FALSE,   # hide not-detected rows from legend
-#   legend_title       = "Species detections",
-#   bathy_res          = 4        # coarse for fast draft
-# )
 
 ```
+
+
+
+# IPI Histogram
+
+```{r ipiHist}
+source(here::here("_code/brydes/analyze_burst_ipi.R"))
+be500 <- raven %>%
+  filter(be500 == "Y")
+# Auto peak detection (default)
+ipi_result <- analyze_burst_ipi(be500, maxIPI = 60.0, bin_width = 1, show_median = FALSE, 
+                            table_path = here("output/brydes/brydes_ipi_summary_table.docx"),
+                            plot_path = here("output/brydes/brydes_ipi_histogram.png"))
+ipi_result
+
+
+```
+
+
+#Plot Detection Values
+
+```{r be500}
+be500 <- raven%>%
+  filter(be500 == "Y")
+be500_plot <- create_acoustic_violin_plots(be500)
+be500_plot
+
+ggplot2::ggsave(
+  filename = here("output/brydes/be500_violin.png"),
+  plot = be500_plot,
+  width = 10,       # Width in inches
+  height = 6,       # Height in inches
+  dpi = 300,        # Standard academic publication resolution
+  bg = "white"      # Explicitly keeps background white (prevents transparent artifacts)
+)
+
+
+# Example: Pushes the labels further to the right (hjust = -0.5) 
+# and higher above the line (vjust = -1)
+# create_acoustic_violin_plots(be500_raven, hjust = -0.5, vjust = -1)
+
+
+```
+
+# Diurnal Plot
+```{r diurnalPlot}
+source(here("_code/brydes/diurnal_polar_plot.R"))
+
+diurnalData <- merge_deploy_review(deploy, review, remove_unmatched_deploy = TRUE)
+# diurnalData$date <- as.POSIXct(diurnalData$date, format = "%Y-%m-%d %H:%M:%S", tz = "UTC")
+
+#Note: 7 rows in 'review' that do not exist in 'deploy', because those had multiple reviewed tapes per deployed buoy
+
+plot_diurnal_calls(
+  diurnalData,
+  be_color    = "#FB8C00",
+  be500_color = "#FFF176",
+  day_color   = "white",
+  dawn_color  = "#F6F6FF",
+  night_color = "gray",
+  shared_effort_scale = TRUE,
+  plot_title  = NULL,
+  be_title    = "Bryde's Mid-Frequency Calls",
+  be500_title = "Bryde's 500-Hz Calls",
+  save_path   = here("output/brydes/diurnal_plot.png"),
+  width = 14, height = 7,
+  force_dawn = 5, force_sunrise = 6.0,
+  force_sunset = 18.0, force_dusk = 19,
+  show_det_labels = FALSE
+)
+
+
+
+# If your columns have different names
+#plot_diurnal_calls(diurnalData, date_col = "start_time", lat_col = "lat", lon_col = "lon")
+```
+
 
 # Table of deployments, good recording time, species deployed on, species within 10nmi or 2 hours
 
@@ -202,21 +249,40 @@ table_data <- deployTableData %>%
     date, latitude, longitude, "72_sightings", 
     effort_min, recording_quality_code, be, be500
   ) %>%
+  mutate(recording_quality_code = str_to_sentence(recording_quality_code))%>%
+  mutate(latitude = as.numeric(latitude),
+         longitude = as.numeric(longitude))%>%
   dplyr::rename_with(~ stringr::str_to_title(stringr::str_replace_all(.x, "_", " ")))
 
-  
+#Choose which table to run
+ table_data <- table_data %>%
+   filter(Be %in% TRUE)
+ 
+ # table_data <- table_data %>%
+ #   filter(!Be %in% TRUE)
 
-# 2. Build the wide publication-ready table
+# 3. Build the wide publication-ready table
 publication_table <- table_data %>%
   gt() %>%
   cols_label(
-    `72 Sightings` = "Bryde's Sightings"
+    `72 Sightings` = "Bryde's Sightings",
+    'Be' = "Bryde's MF Calls",
+    'Be500' = "Bryde's 500 Hz"
   ) %>%
   # Format column headers to be bold
   tab_style(
     style = cell_text(weight = "bold"),
     locations = cells_column_labels()
   ) %>%
+  # Change decimal places for columns
+    fmt_number(
+    columns = `Effort Min`,
+    decimals = 1
+  )%>%
+  fmt_number(
+    columns = c(Latitude, Longitude),
+    decimals = 3
+  )%>%
   # Add a double line beneath the column headers
   tab_style(
     style = cell_borders(
@@ -246,33 +312,18 @@ publication_table <- table_data %>%
 
 # Preview the table
 publication_table
-
-gtsave(data = publication_table, filename = here("output/brydes_DeployTable.png"),zoom = 2, 
+#Choose Save table for Brydes Detections
+gtsave(data = publication_table, filename = here("output/brydes/brydes_DeployTable.png"),zoom = 2,
        vwidth = 1600, vheight = 900,)
-gtsave(publication_table, here("output/brydes_DeployTable.docx"))
+gtsave(publication_table, here("output/brydes/brydes_DeployTable.docx"))
+
+#Save Supplementary table with OTHER detections
+# gtsave(data = publication_table, filename = here("output/brydes/supplementary_DeployTable.png"),zoom = 2,
+#        vwidth = 1600, vheight = 900,)
+# gtsave(publication_table, here("output/brydes/supplementary_DeployTable.docx"))
 
 ```
 
-# IPI Histogram
-
-```{r ipiHist}
-be500 <- raven %>%
-  filter(be500 == "Y")
-# Simple script to get the individual valid IPIs
-valid_ipis <- be500 %>%
-  mutate(sonobuoy_ID = paste(cruise, dat_number, sep = "-")) %>%
-  arrange(sonobuoy_ID, date) %>%
-  group_by(sonobuoy_ID) %>%
-  mutate(IPI = lead(center_time_s) - center_time_s) %>%
-  ungroup() %>%
-  filter(!is.na(IPI), IPI <= 2.5) # using 2.5 as an example maxIPI
-
-# This will automatically detect if your burst pulses are unimodal or bimodal
-medians_found <- plot_ipi_histogram(valid_ipis$IPI)
-#Or, force num_peaks
-medians_found <- plot_ipi_histogram(valid_ipis$IPI, num_peaks = 2)
-
-```
 #Table of detections
 For each call type, give median and 10th, 90th percentiles for: duration of call (s), low frequency (Hz), high frequency (Hz), center frequency (Hz), peak frequency (Hz), delta frequency (Hz), and signal-to-noise ratio (dB). Where appropriate, give ICI and IPI.
 ```{r be500Table}
@@ -297,8 +348,8 @@ publication_table <- ipi_summary %>%
   ) %>%
   # Format numeric columns to a standard 3 decimal places
   fmt_number(
-    columns = c(mean_IPI, median_IPI),
-    decimals = 3
+    columns = c(mean_IPI, median_IPI, range_IPI),
+    decimals = 1
   ) %>%
   # Align text beautifully (ID left-aligned, metrics centered)
   cols_align(
@@ -344,64 +395,7 @@ publication_table <- ipi_summary %>%
 # Print the table
 publication_table
 
-gtsave(data = publication_table, filename = here("output/brydes_IPITable.png"),zoom = 2, 
+gtsave(data = publication_table, filename = here("output/brydes/brydes_IPITable.png"),zoom = 2, 
        vwidth = 1600, vheight = 900,)
-gtsave(publication_table, here("output/brydes_IPITable.docx"))
+gtsave(publication_table, here("output/brydes/brydes_IPITable.docx"))
 ```
-
-#Plot Detection Values
-
-```{r be500}
-be500 <- raven%>%
-  filter(be500 == "Y")
-be500_plot <- create_acoustic_violin_plots(be500)
-be500_plot
-
-ggplot2::ggsave(
-  filename = here("output/be500_violin.png"),
-  plot = be500_plot,
-  width = 10,       # Width in inches
-  height = 6,       # Height in inches
-  dpi = 300,        # Standard academic publication resolution
-  bg = "white"      # Explicitly keeps background white (prevents transparent artifacts)
-)
-
-
-# Example: Pushes the labels further to the right (hjust = -0.5) 
-# and higher above the line (vjust = -1)
-# create_acoustic_violin_plots(be500_raven, hjust = -0.5, vjust = -1)
-
-
-```
-
-```{r diurnalPlot}
-source(here("_code/diurnal_polar_plot.R"))
-
-diurnalData <- merge_deploy_review(deploy, review, remove_unmatched_deploy = TRUE)
-diurnalData$date <- as.POSIXct(diurnalData$date, format = "%Y-%m-%d %H:%M:%S", tz = "")
-
-#Note: 7 rows in 'review' that do not exist in 'deploy', because those had multiple reviewed tapes per deployed buoy
-
-# Minimal — display in RStudio viewer
-plot_diurnal_calls(diurnalData)
-
-# Save to file
-plot_diurnal_calls(diurnalData, save_path = here("output", "diurnal_plot.png"))
-
-# Custom colors, titles, and figure size
-plot_diurnal_calls(
-  diurnalData,
-  be_color    = "steelblue",
-  be500_color = "firebrick",
-  plot_title  = "HICEAS 2002 — Diurnal Call Patterns",
-  save_path   = here("output", "diurnal_plot.png"),
-  width = 14, height = 7
-)
-
-# If your columns have different names
-plot_diurnal_calls(diurnalData, date_col = "start_time", lat_col = "lat", lon_col = "lon")
-```
-
-
-
-

@@ -20,42 +20,124 @@ library(patchwork)
 library(swfscDAS)
 library(lubridate)
 library(ggplot2)
-
-
+library(flextable)
+library(extrafont)
+# font_import(pattern = "Times")  # one-time, slow
+# loadfonts(device = "win")  # or "pdf"/"postscript" depending on OS
 
 # Source Other Files
-source(here::here("_code/diurnal_polar_plot.R"))
+source(here::here("_code/brydes/diurnal_polar_plot.R"))
 
 # =============================================================================
 # DataPrep: Add Sightings to Deploy
 # =============================================================================
 prep_deploy_data <- function(sightings_path, deploy_df, species_ids,
-                             output_path = NULL) {
+                             output_path = NULL,
+                             strict_check = TRUE,
+                             # Must match OUTPUT_DATE_FORMAT in merge_sonobuoy_csv.R.
+                             # deploy_df$date is expected to already be standardized
+                             # to this single format by that upstream script.
+                             date_format = "%m/%d/%Y %H:%M") {
   
   # 1. Load sightings from path; deploy is already a dataframe
   sightings_raw <- read_csv(here(sightings_path), show_col_types = FALSE) %>%
     clean_names()
   
   # 2. Clean and format deploy
+  n_na_before <- sum(is.na(deploy_df$date))
+  
   deploy_clean <- deploy_df %>%
     mutate(
       cruise          = as.character(cruise),
       sonobuoy_number = as.character(sonobuoy_number),
       dat_number      = as.character(dat_tape_number),
-      date            = as.POSIXct(date,format = "%Y-%m-%dT%H:%M:%SZ",
-        tz = "")
+      # tz = "UTC" is a neutral label for floating local times only —
+      # no timezone conversion happens; it just avoids Sys.timezone().
+      date            = as.POSIXct(date, format = date_format, tz = "UTC")
     )
+  
+  n_na_after <- sum(is.na(deploy_clean$date))
+  
+  if (n_na_after > n_na_before) {
+    stop(
+      "prep_deploy_data(): date parsing introduced ", n_na_after - n_na_before,
+      " new NA value(s) in `date`. This means some values in deploy_df$date ",
+      "don't match date_format = '", date_format, "'. Since deploy_df$date is ",
+      "expected to already be standardized by merge_sonobuoy_csv.R's ",
+      "OUTPUT_DATE_FORMAT, check whether that format changed, or whether ",
+      "deploy_df was built some other way.",
+      call. = FALSE
+    )
+  }
   
   # 3. Clean and format sightings
   sightings_clean <- sightings_raw %>%
     mutate(
       cruise           = as.character(cruise),
       sonobuoy_number  = as.character(sonobuoy_number),
+      # ASSUMPTION: sightings has a column that becomes `dat_number` after
+      # clean_names(). If it's actually named `dat_tape_number` (like deploy's
+      # raw column), change the right-hand side below to
+      # as.character(dat_tape_number). Verify against your actual column names.
+      dat_number       = as.character(dat_number),
       sighting_species = as.character(sighting_species),
       near_species     = as.character(near_species)
     )
   
+  # 3.5 CHECK: every deploy row must have a matching sightings row,
+  #     matched on cruise + sonobuoy_number + dat_number. It's fine for
+  #     sightings to have combos that aren't in deploy — only the reverse
+  #     direction is checked.
+  #
+  #     strict_check = TRUE  (default): stop() and halt execution
+  #     strict_check = FALSE: warning() and continue (data will carry NAs
+  #                            for the missing combos downstream)
+  deploy_keys <- deploy_clean %>%
+    select(cruise, sonobuoy_number, dat_number) %>%
+    distinct()
+  
+  sightings_keys <- sightings_clean %>%
+    select(cruise, sonobuoy_number, dat_number) %>%
+    distinct()
+  
+  missing_in_sightings <- anti_join(
+    deploy_keys, sightings_keys,
+    by = c("cruise", "sonobuoy_number", "dat_number")
+  )
+  
+  if (nrow(missing_in_sightings) > 0) {
+    missing_list <- missing_in_sightings %>%
+      mutate(
+        combo = paste0(
+          "cruise=", cruise,
+          ", sonobuoy_number=", sonobuoy_number,
+          ", dat_number=", dat_number
+        )
+      ) %>%
+      pull(combo)
+    
+    msg <- paste0(
+      "prep_deploy_data(): ", nrow(missing_in_sightings),
+      " deploy row(s) have no matching entry in sightings ",
+      "(matched on cruise + sonobuoy_number + dat_number):\n",
+      paste0("  - ", missing_list, collapse = "\n")
+    )
+    
+    if (strict_check) {
+      stop(msg, call. = FALSE)
+    } else {
+      warning(msg, call. = FALSE)
+    }
+  }
+  
   # 4. Get all cruise/sonobuoy combos present in sightings (for NA flagging)
+  #    NOTE: this stays on 2 keys (cruise/sonobuoy_number) for the species
+  #    loop below, which is about linking a *species observation* to a
+  #    deployment record, not the same thing as the existence check above.
+  #    When strict_check = TRUE, step 3.5 guarantees every deploy combo has
+  #    a matching sightings combo, so the is.na(.in_sightings) branch below
+  #    is a redundant safety net. When strict_check = FALSE, that branch is
+  #    what actually produces the NAs for any combos flagged as missing.
   sightings_combos <- sightings_clean %>%
     select(cruise, sonobuoy_number) %>%
     distinct() %>%
@@ -228,11 +310,6 @@ merge_deploy_review <- function(deploy_df, review_df, remove_unmatched_deploy = 
 #   return(merged_df)
 # }
 
-# =============================================================================
-# DataPrep: Merge Validated Raven Files
-# =============================================================================
-
-
 
 ################################
 # Merge Raven Selection Tables #
@@ -270,8 +347,130 @@ merge_raven_tables <- function(folder_path, time_zone = "UTC") {
         filename = fname,
         cruise_number = cruise_num,
         dat_number = dat_num,
-        date = as.POSIXct(raw_datetime, format = "%y%m%d %H%M", tz = time_zone)
+        date = as.POSIXct(raw_datetime, format = "%Y-%m-%dT%H:%M:%SZ",
+                          tz = "UTC")
       )
+    prep_deploy_data <- function(sightings_path, deploy_df, species_ids,
+                             output_path = NULL) {
+  
+  # 1. Load sightings from path; deploy is already a dataframe
+  sightings_raw <- read_csv(here(sightings_path), show_col_types = FALSE) %>%
+    clean_names()
+  
+  # 2. Clean and format deploy
+  deploy_clean <- deploy_df %>%
+    mutate(
+      cruise          = as.character(cruise),
+      sonobuoy_number = as.character(sonobuoy_number),
+      dat_number      = as.character(dat_tape_number),
+      # tz = "UTC" is intentional: the raw strings end in "Z" (UTC/Zulu).
+      # Parsing with tz = "UTC" stores the literal clock digits with zero
+      # offset applied, so the result is identical no matter what machine
+      # or locale this runs on. Do NOT change this to tz = "" or Sys.timezone().
+      date            = as.POSIXct(date, format = "%Y-%m-%dT%H:%M:%SZ",
+        tz = "UTC")
+    )
+  
+  # 3. Clean and format sightings
+  sightings_clean <- sightings_raw %>%
+    mutate(
+      cruise           = as.character(cruise),
+      sonobuoy_number  = as.character(sonobuoy_number),
+      # ASSUMPTION: sightings has a column that becomes `dat_number` after
+      # clean_names(). If it's actually named `dat_tape_number` (like deploy's
+      # raw column), change the right-hand side below to
+      # as.character(dat_tape_number). Verify against your actual column names.
+      dat_number       = as.character(dat_number),
+      sighting_species = as.character(sighting_species),
+      near_species     = as.character(near_species)
+    )
+  
+  # 3.5 HARD CHECK: every deploy row must have a matching sightings row,
+  #     matched on cruise + sonobuoy_number + dat_number. It's fine for
+  #     sightings to have combos that aren't in deploy — only the reverse
+  #     direction is checked. Any mismatch halts execution.
+  deploy_keys <- deploy_clean %>%
+    select(cruise, sonobuoy_number, dat_number) %>%
+    distinct()
+  
+  sightings_keys <- sightings_clean %>%
+    select(cruise, sonobuoy_number, dat_number) %>%
+    distinct()
+  
+  missing_in_sightings <- anti_join(
+    deploy_keys, sightings_keys,
+    by = c("cruise", "sonobuoy_number", "dat_number")
+  )
+  
+  if (nrow(missing_in_sightings) > 0) {
+    missing_list <- missing_in_sightings %>%
+      mutate(
+        combo = paste0(
+          "cruise=", cruise,
+          ", sonobuoy_number=", sonobuoy_number,
+          ", dat_number=", dat_number
+        )
+      ) %>%
+      pull(combo)
+    
+    stop(
+      "prep_deploy_data(): ", nrow(missing_in_sightings),
+      " deploy row(s) have no matching entry in sightings ",
+      "(matched on cruise + sonobuoy_number + dat_number):\n",
+      paste0("  - ", missing_list, collapse = "\n"),
+      call. = FALSE
+    )
+  }
+  
+  # 4. Get all cruise/sonobuoy combos present in sightings (for NA flagging)
+  #    NOTE: this stays on 2 keys (cruise/sonobuoy_number) for the species
+  #    loop below, which is about linking a *species observation* to a
+  #    deployment record, not the same thing as the strict existence check
+  #    above. Given the check in step 3.5 now guarantees every deploy combo
+  #    has a matching sightings combo, the is.na(.in_sightings) branch below
+  #    is effectively a redundant safety net rather than a live code path —
+  #    left in place intentionally.
+  sightings_combos <- sightings_clean %>%
+    select(cruise, sonobuoy_number) %>%
+    distinct() %>%
+    mutate(.in_sightings = TRUE)
+  
+  # 5. Loop over species_ids with purrr::reduce, adding one column per species
+  processed_deploy <- purrr::reduce(
+    as.character(species_ids),
+    .init = deploy_clean,
+    function(current_df, sp_id) {
+      
+      new_col_name <- paste0(sp_id, "_sightings")
+      
+      species_matches <- sightings_clean %>%
+        filter(sighting_species == sp_id | near_species == sp_id) %>%
+        select(cruise, sonobuoy_number) %>%
+        distinct() %>%
+        mutate(!!new_col_name := TRUE)
+      
+      current_df %>%
+        left_join(species_matches, by = c("cruise", "sonobuoy_number")) %>%
+        left_join(sightings_combos, by = c("cruise", "sonobuoy_number")) %>%
+        mutate(
+          !!new_col_name := case_when(
+            is.na(.in_sightings)          ~ NA,
+            .data[[new_col_name]] == TRUE ~ TRUE,
+            TRUE                          ~ FALSE
+          )
+        ) %>%
+        select(-.in_sightings)
+    }
+  )
+  
+  # 6. Optionally save to .rds
+  if (!is.null(output_path)) {
+    saveRDS(processed_deploy, file = here(output_path))
+    message("Output saved to: ", here(output_path))
+  }
+  
+  return(processed_deploy)
+}
     
     return(table_data)
   }
@@ -837,7 +1036,7 @@ create_acoustic_violin_plots <- function(data, hjust = -0.15, vjust = -0.5) {
       axis.text.x = element_blank(),
       axis.ticks.x = element_blank(),
       panel.grid.major.x = element_blank(),
-      strip.text = element_text(face = "bold", size = 11)
+      strip.text = element_text(family = "serif", face = "bold", size = 11)
     )
   
   # 5. Build Frequency Component
@@ -847,6 +1046,7 @@ create_acoustic_violin_plots <- function(data, hjust = -0.15, vjust = -0.5) {
       data = freq_labels,
       aes(x = metric, y = median_val, label = label_text),
       inherit.aes = FALSE, 
+      family = "serif",
       fontface = "bold",
       size = 3.5,
       hjust = hjust,    
@@ -864,6 +1064,7 @@ create_acoustic_violin_plots <- function(data, hjust = -0.15, vjust = -0.5) {
       data = dur_labels,
       aes(x = metric, y = median_val, label = label_text),
       inherit.aes = FALSE,
+      family = "serif",
       fontface = "bold",
       size = 3.5,
       hjust = hjust,
@@ -876,8 +1077,8 @@ create_acoustic_violin_plots <- function(data, hjust = -0.15, vjust = -0.5) {
   
   # 7. Layout composition
   combined_plot <- (p_freq | p_dur) + 
-    plot_layout(widths = c(2, 1)) +
-    plot_annotation(title = "Distribution of Acoustic Features")
+    plot_layout(widths = c(2, 1)) 
+    # plot_annotation(title = "Distribution of Acoustic Features")
   
   return(combined_plot)
 }
@@ -964,272 +1165,172 @@ plot_ipi_histogram <- function(ipi_data, num_peaks = NULL) {
   print(p)
   return(peak_medians)
 }
-#####################
-# Create IPI Tables #
-#####################
-analyze_burst_ipi <- function(data, maxIPI) {
-  
-  # Step 2 & 3: Create IDs, sort, and calculate IPI based on center_time_s
-  processed_data <- data %>%
-    # 2. Create sonobuoy_ID
-    mutate(sonobuoy_ID = paste(cruise, dat_number, sep = "-")) %>%
-    # 3. Order rows by sonobuoy_ID (first) and date (second)
-    arrange(sonobuoy_ID, date) %>%
-    # Group by sonobuoy_ID so lead() doesn't accidentally pull from the next recording
-    group_by(sonobuoy_ID) %>%
-    # Measure time between current center_time_s and the next row's center_time_s
-    mutate(IPI = lead(center_time_s) - center_time_s) %>%
-    ungroup()
-  
-  # Step 4 & 5: Filter, calculate metrics, and summarize
-  summary_df <- processed_data %>%
-    # Remove NA values (the last row of each recording) for accurate counts/metrics
-    filter(!is.na(IPI)) %>%
-    group_by(sonobuoy_ID) %>%
-    summarise(
-      # Count how many IPIs exceed the user-defined maxIPI
-      exceeded_max_count = sum(IPI > maxIPI),
-      
-      # Calculate mean, median, and range EXCLUDING values over maxIPI
-      mean_IPI   = mean(IPI[IPI <= maxIPI], na.rm = TRUE),
-      median_IPI = median(IPI[IPI <= maxIPI], na.rm = TRUE),
-      
-      # Create the character string range (min - max) for valid values
-      range_IPI  = paste(
-        round(min(IPI[IPI <= maxIPI], na.rm = TRUE), 4), 
-        round(max(IPI[IPI <= maxIPI], na.rm = TRUE), 4), 
-        sep = " - "
-      ),
-      .groups = "drop"
-    ) %>%
-    # If a sonobuoy had NO values under maxIPI, replace NaN/Inf text with NA
-    mutate(range_IPI = if_else(grepl("Inf|NaN", range_IPI), NA_character_, range_IPI))
-  
-  return(summary_df)
-}
-
-#######################
-# add offsetGMT value #
-#######################
-# =============================================================================
-# FUNCTION 1: Process .das files and add offsetGMT column to brydes_df
-# =============================================================================
-
-add_offset_gmt <- function(df, das_dir = here("data/surveyData")) {
-  
-  # --- Step 1: Find all .das files and process/cache as .rds ---
-  das_files <- list.files(das_dir, pattern = "\\.das$", 
-                          full.names = TRUE, ignore.case = TRUE)
-  
-  if (length(das_files) == 0) {
-    warning("No .das files found in: ", das_dir)
-    return(df %>% mutate(offsetGMT = NA_character_))
-  }
-  
-  message("Processing ", length(das_files), " .das file(s)...")
-  
-  das_cache <- map(das_files, function(das_path) {
-    
-    rds_path <- sub("\\.das$", ".rds", das_path, ignore.case = TRUE)
-    
-    # Load cached RDS if it exists, otherwise process and save
-    if (file.exists(rds_path)) {
-      message("  Loading cached RDS: ", basename(rds_path))
-      processed <- readRDS(rds_path)
-    } else {
-      message("  Processing: ", basename(das_path))
-      raw       <- das_read(das_path)
-      processed <- das_process(raw)
-      saveRDS(processed, rds_path)
-      message("  Saved RDS: ", basename(rds_path))
-    }
-    
-    list(filename = basename(das_path), data = processed)
-  })
-  
-  # --- Step 2: For each row in df, find matching RDS and determine offsetGMT ---
-  
-  get_offset_for_row <- function(cruise_val, date_val) {
-    
-    # Find the cached dataset whose filename contains the cruise number
-    match_idx <- detect_index(das_cache, function(x) {
-      grepl(as.character(cruise_val), x$filename, fixed = TRUE)
-    })
-    
-    if (match_idx == 0) {
-      warning("No .das file found containing cruise: ", cruise_val)
-      return(NA_character_)
-    }
-    
-    das_data <- das_cache[[match_idx]]$data
-    
-    # Ensure DateTime and OffsetGMT columns exist
-    if (!all(c("DateTime", "OffsetGMT") %in% names(das_data))) {
-      warning("Required columns (DateTime, OffsetGMT) not found for cruise: ", 
-              cruise_val)
-      return(NA_character_)
-    }
-    
-    # # Define ±24 hr window around the row's date
-    # window_start <- date_val - dhours(24)
-    # window_end   <- date_val + dhours(24)
-    # Define ±6 hr window around the row's date
-    window_start <- date_val - dhours(1)
-    window_end   <- date_val + dhours(1)
-    
-    window_data <- das_data %>%
-      filter(!is.na(OffsetGMT),
-             DateTime >= window_start,
-             DateTime <= window_end)
-    
-    if (nrow(window_data) == 0) {
-      warning("No DAS records within ±24 hrs for cruise ", cruise_val, 
-              " around ", date_val)
-      return(NA_character_)
-    }
-    
-    unique_offsets <- unique(window_data$OffsetGMT)
-    
-    if (length(unique_offsets) == 1) {
-      # Stable offset — return as character (can be coerced later)
-      return(as.character(unique_offsets))
-    } else {
-      return("CHANGE")
-    }
-  }
-  
-  # Apply row-wise
-  message("Determining offsetGMT for ", nrow(df), " row(s)...")
-  
-  df <- df %>%
-    mutate(
-      offsetGMT = map2_chr(
-        cruise, date,
-        ~ get_offset_for_row(cruise_val = .x, date_val = .y)
-      )
-    )
-  
-  n_change <- sum(df$offsetGMT == "CHANGE", na.rm = TRUE)
-  n_na     <- sum(is.na(df$offsetGMT))
-  n_ok     <- nrow(df) - n_change - n_na
-  
-  message(
-    "offsetGMT summary:\n",
-    "  Stable offsets: ", n_ok, "\n",
-    "  CHANGE flags:   ", n_change, "\n",
-    "  NAs (no match): ", n_na
-  )
-  
-  df
-}
 
 
-# =============================================================================
-# FUNCTION 2: Convert 'date' to 'date_UTC' using 'offsetGMT'
-# =============================================================================
-
-add_date_utc <- function(df) {
-  
-  if (!all(c("date", "offsetGMT") %in% names(df))) {
-    stop("df must contain 'date' and 'offsetGMT' columns. ",
-         "Run add_offset_gmt() first.")
-  }
-  
-  df <- df %>%
-    mutate(
-      date_UTC = case_when(
-        is.na(offsetGMT)          ~ NA_POSIXct_,
-        offsetGMT == "CHANGE"     ~ NA_POSIXct_,
-        TRUE ~ {
-          offset_hours <- as.numeric(offsetGMT)
-          # Local time = UTC + offset, so UTC = local - offset
-          date - dhours(offset_hours)
-        }
-      )
-    )
-  
-  n_converted <- sum(!is.na(df$date_UTC))
-  n_na        <- sum(is.na(df$date_UTC))
-  
-  message(
-    "date_UTC summary:\n",
-    "  Successfully converted: ", n_converted, "\n",
-    "  Left as NA:             ", n_na, 
-    " (CHANGE flags or missing offsetGMT)"
-  )
-  
-  df
-}
-
-
-# =============================================================================
-# USAGE
-# =============================================================================
-
-# Step 1 — adds offsetGMT; review CHANGE rows before proceeding
-#brydes_df <- brydes_df %>% add_offset_gmt()
-
-# Optional: inspect rows needing manual review
-#brydes_df %>% filter(offsetGMT == "CHANGE" | is.na(offsetGMT)) %>% View()
-
-# Step 2 — convert to UTC once you're satisfied with offsetGMT values
-#brydes_df <- brydes_df %>% add_date_utc()
-
-#######################
-# Combine Survey Data #
-#######################
-combine_survey_data <- function(
-    input_dir = here("data", "surveyData"),
-    output_file = here("data", "surveyData.csv"),
-    keep_date_raw = FALSE
-) {
-  
-  parse_survey_date <- function(x) {
-    coalesce(
-      as.POSIXct(x, format = "%Y-%m-%d %H:%M:%S"),
-      as.POSIXct(x, format = "%m/%d/%Y %H:%M"),
-      as.POSIXct(x, format = "%m/%d/%Y %H:%M:%S"),
-      as.POSIXct(x, format = "%Y-%m-%d"),
-      as.POSIXct(x, format = "%m/%d/%Y")
-    )
-  }
-  
-  csv_files <- list.files(
-    path = input_dir,
-    pattern = "\\.csv$",
-    full.names = TRUE
-  )
-  
-  survey_data <- csv_files %>%
-    purrr::map_dfr(~ {
-      
-      dat <- readr::read_csv(
-        .x,
-        col_types = readr::cols(.default = readr::col_character()),
-        show_col_types = FALSE
-      ) %>%
-        janitor::clean_names()
-      
-      if ("date" %in% names(dat)) {
-        dat <- dat %>%
-          mutate(
-            date_raw = date,
-            date = parse_survey_date(date)
-          )
-      }
-      
-      dat
-    })
-  
-  # Drop date_raw if not requested
-  if (!keep_date_raw && "date_raw" %in% names(survey_data)) {
-    survey_data <- survey_data %>%
-      select(-date_raw)
-  }
-  
-  readr::write_csv(survey_data, output_file)
-  
-  survey_data
-}
-
+# #######################
+# # add offsetGMT value #
+# #######################
+# # =============================================================================
+# # FUNCTION 1: Process .das files and add offsetGMT column to brydes_df
+# # =============================================================================
+# 
+# add_offset_gmt <- function(df, das_dir = here("data/surveyData")) {
+#   
+#   # --- Step 1: Find all .das files and process/cache as .rds ---
+#   das_files <- list.files(das_dir, pattern = "\\.das$", 
+#                           full.names = TRUE, ignore.case = TRUE)
+#   
+#   if (length(das_files) == 0) {
+#     warning("No .das files found in: ", das_dir)
+#     return(df %>% mutate(offsetGMT = NA_character_))
+#   }
+#   
+#   message("Processing ", length(das_files), " .das file(s)...")
+#   
+#   das_cache <- map(das_files, function(das_path) {
+#     
+#     rds_path <- sub("\\.das$", ".rds", das_path, ignore.case = TRUE)
+#     
+#     # Load cached RDS if it exists, otherwise process and save
+#     if (file.exists(rds_path)) {
+#       message("  Loading cached RDS: ", basename(rds_path))
+#       processed <- readRDS(rds_path)
+#     } else {
+#       message("  Processing: ", basename(das_path))
+#       raw       <- das_read(das_path)
+#       processed <- das_process(raw)
+#       saveRDS(processed, rds_path)
+#       message("  Saved RDS: ", basename(rds_path))
+#     }
+#     
+#     list(filename = basename(das_path), data = processed)
+#   })
+#   
+#   # --- Step 2: For each row in df, find matching RDS and determine offsetGMT ---
+#   
+#   get_offset_for_row <- function(cruise_val, date_val) {
+#     
+#     # Find the cached dataset whose filename contains the cruise number
+#     match_idx <- detect_index(das_cache, function(x) {
+#       grepl(as.character(cruise_val), x$filename, fixed = TRUE)
+#     })
+#     
+#     if (match_idx == 0) {
+#       warning("No .das file found containing cruise: ", cruise_val)
+#       return(NA_character_)
+#     }
+#     
+#     das_data <- das_cache[[match_idx]]$data
+#     
+#     # Ensure DateTime and OffsetGMT columns exist
+#     if (!all(c("DateTime", "OffsetGMT") %in% names(das_data))) {
+#       warning("Required columns (DateTime, OffsetGMT) not found for cruise: ", 
+#               cruise_val)
+#       return(NA_character_)
+#     }
+#     
+#     # # Define ±24 hr window around the row's date
+#     # window_start <- date_val - dhours(24)
+#     # window_end   <- date_val + dhours(24)
+#     # Define ±6 hr window around the row's date
+#     window_start <- date_val - dhours(1)
+#     window_end   <- date_val + dhours(1)
+#     
+#     window_data <- das_data %>%
+#       filter(!is.na(OffsetGMT),
+#              DateTime >= window_start,
+#              DateTime <= window_end)
+#     
+#     if (nrow(window_data) == 0) {
+#       warning("No DAS records within ±24 hrs for cruise ", cruise_val, 
+#               " around ", date_val)
+#       return(NA_character_)
+#     }
+#     
+#     unique_offsets <- unique(window_data$OffsetGMT)
+#     
+#     if (length(unique_offsets) == 1) {
+#       # Stable offset — return as character (can be coerced later)
+#       return(as.character(unique_offsets))
+#     } else {
+#       return("CHANGE")
+#     }
+#   }
+#   
+#   # Apply row-wise
+#   message("Determining offsetGMT for ", nrow(df), " row(s)...")
+#   
+#   df <- df %>%
+#     mutate(
+#       offsetGMT = map2_chr(
+#         cruise, date,
+#         ~ get_offset_for_row(cruise_val = .x, date_val = .y)
+#       )
+#     )
+#   
+#   n_change <- sum(df$offsetGMT == "CHANGE", na.rm = TRUE)
+#   n_na     <- sum(is.na(df$offsetGMT))
+#   n_ok     <- nrow(df) - n_change - n_na
+#   
+#   message(
+#     "offsetGMT summary:\n",
+#     "  Stable offsets: ", n_ok, "\n",
+#     "  CHANGE flags:   ", n_change, "\n",
+#     "  NAs (no match): ", n_na
+#   )
+#   
+#   df
+# }
+# 
+# 
+# # =============================================================================
+# # FUNCTION 2: Convert 'date' to 'date_UTC' using 'offsetGMT'
+# # =============================================================================
+# 
+# add_date_utc <- function(df) {
+#   
+#   if (!all(c("date", "offsetGMT") %in% names(df))) {
+#     stop("df must contain 'date' and 'offsetGMT' columns. ",
+#          "Run add_offset_gmt() first.")
+#   }
+#   
+#   df <- df %>%
+#     mutate(
+#       date_UTC = case_when(
+#         is.na(offsetGMT)          ~ NA_POSIXct_,
+#         offsetGMT == "CHANGE"     ~ NA_POSIXct_,
+#         TRUE ~ {
+#           offset_hours <- as.numeric(offsetGMT)
+#           # Local time = UTC + offset, so UTC = local - offset
+#           date - dhours(offset_hours)
+#         }
+#       )
+#     )
+#   
+#   n_converted <- sum(!is.na(df$date_UTC))
+#   n_na        <- sum(is.na(df$date_UTC))
+#   
+#   message(
+#     "date_UTC summary:\n",
+#     "  Successfully converted: ", n_converted, "\n",
+#     "  Left as NA:             ", n_na, 
+#     " (CHANGE flags or missing offsetGMT)"
+#   )
+#   
+#   df
+# }
+# 
+# 
+# # =============================================================================
+# # USAGE
+# # =============================================================================
+# 
+# # Step 1 — adds offsetGMT; review CHANGE rows before proceeding
+# #brydes_df <- brydes_df %>% add_offset_gmt()
+# 
+# # Optional: inspect rows needing manual review
+# #brydes_df %>% filter(offsetGMT == "CHANGE" | is.na(offsetGMT)) %>% View()
+# 
+# # Step 2 — convert to UTC once you're satisfied with offsetGMT values
+# #brydes_df <- brydes_df %>% add_date_utc()
 
