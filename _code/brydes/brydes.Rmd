@@ -328,9 +328,11 @@ gtsave(publication_table, here("output/brydes/brydes_DeployTable.docx"))
 For each call type, give median and 10th, 90th percentiles for: duration of call (s), low frequency (Hz), high frequency (Hz), center frequency (Hz), peak frequency (Hz), delta frequency (Hz), and signal-to-noise ratio (dB). Where appropriate, give ICI and IPI.
 ```{r be500Table}
 be500 <- raven %>%
-  filter(be500 == "Y")
+  filter(be500 == "Y")%>%
+  mutate(across(where(is.numeric), ~ round(.x, 2)))
 
 ipi_summary <- analyze_burst_ipi(be500, maxIPI = 30)
+  
 
 # View your new summary dataframe
 print(ipi_summary)

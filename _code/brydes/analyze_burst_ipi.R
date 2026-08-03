@@ -34,11 +34,11 @@ analyze_burst_ipi <- function(data, maxIPI,
     group_by(sonobuoy_ID) %>%
     summarise(
       exceeded_max_count = sum(IPI > maxIPI),
-      mean_IPI           = mean(IPI[IPI <= maxIPI],   na.rm = TRUE),
-      median_IPI         = median(IPI[IPI <= maxIPI], na.rm = TRUE),
-      range_IPI          = paste(
-        round(min(IPI[IPI <= maxIPI], na.rm = TRUE), 1),
-        round(max(IPI[IPI <= maxIPI], na.rm = TRUE), 1),
+      mean_IPI           = round((mean(IPI[IPI <= maxIPI],   na.rm = TRUE)), 1),
+      median_IPI         = round((median(IPI[IPI <= maxIPI], na.rm = TRUE)), 1),
+      range_IPI = paste(
+        sprintf("%.1f", min(IPI[IPI <= maxIPI], na.rm = TRUE)),
+        sprintf("%.1f", max(IPI[IPI <= maxIPI], na.rm = TRUE)),
         sep = " - "
       ),
       .groups = "drop"
