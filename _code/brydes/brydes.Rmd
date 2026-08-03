@@ -4,6 +4,8 @@ output: html_document
 ---
 
 ```{r prep results="hide"}
+#| echo: false
+#| warnings: false
 library(here)
 here()
 source(here::here("_code/brydes/_brydesCommonR.R"))
