@@ -350,7 +350,7 @@ publication_table <- ipi_summary %>%
   ) %>%
   # Format numeric columns to a standard 3 decimal places
   fmt_number(
-    columns = c(mean_IPI, median_IPI, range_IPI),
+    columns = c(mean_IPI, median_IPI),
     decimals = 1
   ) %>%
   # Align text beautifully (ID left-aligned, metrics centered)
