@@ -55,7 +55,7 @@ analyze_burst_ipi <- function(data, maxIPI,
       median_IPI          = "Median IPI (s)",
       range_IPI           = "Range (s)"
     ) %>%
-    fmt_number(columns = c(mean_IPI, median_IPI, range_IPI), decimals = 1) %>%
+    fmt_number(columns = c(mean_IPI, median_IPI), decimals = 1) %>%
     tab_style(
       style     = cell_text(font = "Times New Roman"),
       locations = list(cells_body(), cells_column_labels(), cells_title())

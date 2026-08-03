@@ -331,7 +331,7 @@ For each call type, give median and 10th, 90th percentiles for: duration of call
 ```{r be500Table}
 be500 <- raven %>%
   filter(be500 == "Y")%>%
-  mutate(across(where(is.numeric), ~ round(.x, 2)))
+  mutate(across(where(is.numeric), ~ round(.x, 1)))
 
 ipi_summary <- analyze_burst_ipi(be500, maxIPI = 30)
   
@@ -350,7 +350,7 @@ publication_table <- ipi_summary %>%
     median_IPI = "Median IPI (s)",
     range_IPI = "IPI Range (s)"
   ) %>%
-  # Format numeric columns to a standard 3 decimal places
+  # Format numeric columns to a standard 1 decimal place
   fmt_number(
     columns = c(mean_IPI, median_IPI),
     decimals = 1
