@@ -192,6 +192,24 @@ ipi_result
 ```
 
 
+# Bandwidth values
+```{r bandwidth}
+be500 <- raven%>%
+  filter(be500 == "Y")
+
+be500 %>%
+  summarise(
+    mean_delta_freq = mean(delta_freq_hz, na.rm = TRUE),
+    median_delta_freq = median(delta_freq_hz, na.rm = TRUE),
+    min_delta_freq = min(delta_freq_hz, na.rm = TRUE),
+    max_delta_freq = max(delta_freq_hz, na.rm = TRUE),
+    range_delta_freq = max(delta_freq_hz, na.rm = TRUE) - min(delta_freq_hz, na.rm = TRUE)
+  )
+
+  
+```
+
+
 #Plot Detection Values
 
 ```{r be500}
