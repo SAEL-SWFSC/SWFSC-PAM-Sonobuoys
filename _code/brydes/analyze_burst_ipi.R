@@ -18,7 +18,7 @@ analyze_burst_ipi <- function(data, maxIPI,
   # ── 1. Build sonobuoy_ID, sort, calculate IPI ─────────────────────────────
   processed_data <- data %>%
     mutate(sonobuoy_ID = paste(cruise, dat_number, sep = "-")) %>%
-    arrange(sonobuoy_ID, date) %>%
+    arrange(sonobuoy_ID, date, center_time_s) %>%
     group_by(sonobuoy_ID) %>%
     mutate(IPI = lead(center_time_s) - center_time_s) %>%
     ungroup()
@@ -26,7 +26,7 @@ analyze_burst_ipi <- function(data, maxIPI,
   # ── 2. Filter to valid IPIs (≤ maxIPI, non-NA) ────────────────────────────
   valid_ipi <- processed_data %>%
     filter(!is.na(IPI), IPI <= maxIPI)
-   
+  
   
   # ── 3. Summary table (data) ────────────────────────────────────────────────
   summary_df <- processed_data %>%
@@ -108,18 +108,31 @@ analyze_burst_ipi <- function(data, maxIPI,
     overall_median <- median(valid_ipi$IPI)
     
     # Base plot
-    p <- ggplot(valid_ipi, aes(x = IPI)) +
+    # NOTE: fixed vs. mapped `fill` must never both be passed to geom_histogram()
+    # at once (passing fill = NULL alongside mapping = aes(fill = ...) crashes
+    # ggplot2's aesthetic length-check). Build the layer conditionally instead.
+    hist_layer <- if (is.null(fill_by)) {
       geom_histogram(
         binwidth  = bw,
-        mapping   = if (is.null(fill_by)) NULL else aes(fill = .data[[fill_by]]),
-        fill      = if (is.null(fill_by)) "grey75" else NULL,
+        fill      = "grey75",
         color     = "black",
         linewidth = 0.3
-      ) +
+      )
+    } else {
+      geom_histogram(
+        binwidth  = bw,
+        mapping   = aes(fill = .data[[fill_by]]),
+        color     = "black",
+        linewidth = 0.3
+      )
+    }
+    
+    p <- ggplot(valid_ipi, aes(x = IPI)) +
+      hist_layer +
       labs(
         title    = "Inter-Pulse Interval (IPI) Distribution",
         subtitle = paste0("All sonobuoys combined  |  IPI \u2264 ", maxIPI, " s  |  n = ",
-                          nrow(valid_ipi))),
+                          nrow(valid_ipi)),
         x        = "IPI (s)",
         y        = "Count"
       ) +
@@ -132,7 +145,6 @@ analyze_burst_ipi <- function(data, maxIPI,
         axis.line     = element_line(color = "black", linewidth = 0.4),
         panel.grid    = element_blank()
       )
-
     if (!is.null(fill_by)) {
       p <- p +
         ggplot2::scale_fill_manual(values = fill_colors, drop = FALSE)
@@ -184,8 +196,7 @@ analyze_burst_ipi <- function(data, maxIPI,
                      aes(xintercept = x),
                      color    = "black",
                      linetype = "dotdash",
-                     linewidth = 0.7,
-                     inherit.aes = FALSE) +
+                     linewidth = 0.7) +
           geom_label(data = peaks,
                      aes(x     = x,
                          y     = y_scaled,
@@ -212,8 +223,7 @@ analyze_burst_ipi <- function(data, maxIPI,
                    aes(xintercept = x),
                    color     = "black",
                    linetype  = "dotdash",
-                   linewidth = 0.7,
-                   inherit.aes = FALSE) +
+                   linewidth = 0.7) +
         geom_label(data = manual_df,
                    aes(x     = x,
                        y     = Inf,
@@ -235,3 +245,4 @@ analyze_burst_ipi <- function(data, maxIPI,
   
   return(summary_df)
 }
+
