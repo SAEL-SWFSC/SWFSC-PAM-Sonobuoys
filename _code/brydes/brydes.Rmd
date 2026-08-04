@@ -166,9 +166,24 @@ detection_map(
 ```{r ipiHist}
 source(here::here("_code/brydes/analyze_burst_ipi.R"))
 be500 <- raven %>%
-  filter(be500 == "Y")
+  filter(be500 == "Y") %>%
+  mutate(
+    event = case_when(
+      cruise == 1621 & dat_number == 3 ~ "1621-3",
+      cruise == 1621 & dat_number %in% c(8, 9) ~ "1621-8,9",
+      cruise == 1629 & dat_number %in% c(4, 5) ~ "1629-4,5",
+      TRUE ~ "Other"
+    )
+  )
 # Auto peak detection (default)
 ipi_result <- analyze_burst_ipi(be500, maxIPI = 60.0, bin_width = 1, show_median = FALSE, 
+                            fill_by = "event",
+                            fill_colors = c(
+                              "1621-3" = "#cadceb",
+                              "1621-8,9" = "#dbf1d7",
+                              "1629-4,5" = "#e8dbec",
+                              "Other" = "grey75"
+                            ),
                             table_path = here("output/brydes/brydes_ipi_summary_table.docx"),
                             plot_path = here("output/brydes/brydes_ipi_histogram.png"))
 ipi_result

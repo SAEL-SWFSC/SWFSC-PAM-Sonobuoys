@@ -8,6 +8,8 @@ analyze_burst_ipi <- function(data, maxIPI,
                               show_median     = TRUE,
                               peak_method     = c("auto", "manual", "none"),
                               manual_peaks    = NULL,
+                              fill_by         = NULL,
+                              fill_colors     = NULL,
                               table_path      = "ipi_summary_table.png",
                               plot_path       = "ipi_histogram.png") {
   
@@ -23,8 +25,7 @@ analyze_burst_ipi <- function(data, maxIPI,
   
   # ── 2. Filter to valid IPIs (≤ maxIPI, non-NA) ────────────────────────────
   valid_ipi <- processed_data %>%
-    filter(!is.na(IPI), IPI <= maxIPI) %>%
-    pull(IPI)
+    filter(!is.na(IPI), IPI <= maxIPI)
    
   
   # ── 3. Summary table (data) ────────────────────────────────────────────────
@@ -94,28 +95,31 @@ analyze_burst_ipi <- function(data, maxIPI,
   # ── 5. Histogram ────────────────────────────────────────────────────────
   p <- NULL
   
-  if (plot_histogram && length(valid_ipi) > 0) {
+  if (plot_histogram && nrow(valid_ipi) > 0) {
     
     # Bin width: user-supplied or Freedman-Diaconis
     bw <- if (!is.null(bin_width)) {
       bin_width
     } else {
-      bw_fd <- 2 * IQR(valid_ipi) / (length(valid_ipi)^(1/3))
-      if (bw_fd == 0) diff(range(valid_ipi)) / 30 else bw_fd
+      bw_fd <- 2 * IQR(valid_ipi$IPI) / (nrow(valid_ipi)^(1/3))
+      if (bw_fd == 0) diff(range(valid_ipi$IPI)) / 30 else bw_fd
     }
     
-    overall_median <- median(valid_ipi)
+    overall_median <- median(valid_ipi$IPI)
     
     # Base plot
-    p <- ggplot(data.frame(IPI = valid_ipi), aes(x = IPI)) +
-      geom_histogram(binwidth  = bw,
-                     fill      = "grey75",
-                     color     = "black",
-                     linewidth = 0.3) +
+    p <- ggplot(valid_ipi, aes(x = IPI)) +
+      geom_histogram(
+        binwidth  = bw,
+        mapping   = if (is.null(fill_by)) NULL else aes(fill = .data[[fill_by]]),
+        fill      = if (is.null(fill_by)) "grey75" else NULL,
+        color     = "black",
+        linewidth = 0.3
+      ) +
       labs(
         title    = "Inter-Pulse Interval (IPI) Distribution",
         subtitle = paste0("All sonobuoys combined  |  IPI \u2264 ", maxIPI, " s  |  n = ",
-                          length(valid_ipi)),
+                          nrow(valid_ipi))),
         x        = "IPI (s)",
         y        = "Count"
       ) +
@@ -128,6 +132,11 @@ analyze_burst_ipi <- function(data, maxIPI,
         axis.line     = element_line(color = "black", linewidth = 0.4),
         panel.grid    = element_blank()
       )
+
+    if (!is.null(fill_by)) {
+      p <- p +
+        ggplot2::scale_fill_manual(values = fill_colors, drop = FALSE)
+    }
     
     # Median line (optional)
     if (show_median) {
@@ -149,7 +158,7 @@ analyze_burst_ipi <- function(data, maxIPI,
     
     # Automatic peak detection
     if (peak_method == "auto") {
-      dens     <- density(valid_ipi, bw = "SJ")
+      dens     <- density(valid_ipi$IPI, bw = "SJ")
       dens_df  <- data.frame(x = dens$x, y = dens$y)
       n        <- nrow(dens_df)
       is_peak  <- c(FALSE,
@@ -159,8 +168,8 @@ analyze_burst_ipi <- function(data, maxIPI,
       peaks    <- dens_df[is_peak, ]
       peaks    <- peaks[peaks$y >= 0.10 * max(peaks$y), ]
       
-      hist_max   <- max(table(cut(valid_ipi,
-                                  breaks = seq(min(valid_ipi), max(valid_ipi) + bw, by = bw))))
+      hist_max   <- max(table(cut(valid_ipi$IPI,
+                                  breaks = seq(min(valid_ipi$IPI), max(valid_ipi$IPI) + bw, by = bw))))
       dens_scale <- hist_max / max(dens$y)
       
       p <- p +
@@ -185,7 +194,7 @@ analyze_burst_ipi <- function(data, maxIPI,
                      fill     = "white",
                      family   = "Times New Roman",
                      size     = 3.3,
-                     nudge_x  = diff(range(valid_ipi)) * 0.02,
+                     nudge_x  = diff(range(valid_ipi$IPI)) * 0.02,
                      inherit.aes = FALSE)
         
         message(length(peaks$x), " auto-detected peak(s) at IPI = ",
