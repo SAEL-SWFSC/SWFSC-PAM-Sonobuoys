@@ -69,48 +69,30 @@
 #   day_color      - color for daytime slots   (NA = transparent)
 #   dawn_color     - color for twilight slots
 #   night_color    - color for night slots
-#   global_max_eff - if non-NULL, shared effort scale denominator
+#   global_radial_max - maximum value used by the shared hours/calls scale
 # ------------------------------------------------------------
 .make_polar_panel <- function(hourly, det_col, title_str, fill_color,
                                med_dawn, med_sunrise, med_sunset, med_dusk,
                                day_color       = NA,
                                dawn_color      = "#FFB6C1",
                                night_color     = "grey70",
-                               global_max_eff  = NULL,
+                               global_radial_max,
                                show_det_labels = TRUE,
                                time_label_interval = 4) {
 
   det_col_sym <- rlang::sym(det_col)
 
   # --- Scales ------------------------------------------------------------------
-  max_det <- max(hourly[[det_col]], na.rm = TRUE)
-  if (max_det == 0) max_det <- 1
-
-  max_eff   <- if (!is.null(global_max_eff)) global_max_eff else max(hourly$effort_total_min, na.rm = TRUE)
-  if (max_eff == 0) max_eff <- 1
-  eff_scale <- max_det / max_eff
-  radial_ticks <- function(max_value) {
-    ticks <- pretty(c(0, max_value), n = 4)
-    ticks[ticks > 0 & ticks <= max_value]
-  }
-  det_ticks <- radial_ticks(max_det)
-  eff_ticks <- radial_ticks(max_eff)
-
-  # y scale upper limit — shade bars are drawn to exactly this value,
-  # and the axis is pinned here so shading fills the circle without
-  # pushing data bars to microscopic size (the old shade_ymax * 50 bug).
-  # Add 10% headroom above max_det so labels fit outside bar tips.
-  y_max <- max(max_det, max_eff * eff_scale) * 1.15
-  det_grid <- tibble::tibble(
-    x_pos = 0.5,
-    y_pos = det_ticks,
-    label = paste0("calls: ", det_ticks)
-  )
-  eff_grid <- tibble::tibble(
+  radial_ticks <- pretty(c(0, global_radial_max), n = 4)
+  radial_ticks <- radial_ticks[radial_ticks > 0]
+  radial_max <- max(radial_ticks, global_radial_max)
+  y_max <- radial_max * 1.15
+  radial_grid <- tibble::tibble(
     x_pos = 23.5,
-    y_pos = eff_ticks * eff_scale,
-    label = paste0("effort (min): ", eff_ticks)
+    y_pos = radial_ticks,
+    label = format(radial_ticks, trim = TRUE, scientific = FALSE)
   )
+  text_size <- 12 / ggplot2::.pt
 
   # --- Assign each hour a period color -----------------------------------------
   period_colors <- sapply(0:23, function(h) {
@@ -133,7 +115,7 @@
     dplyr::filter(!!det_col_sym > 0) |>
     dplyr::mutate(
       x_pos = hour_of_day + 0.5,
-      y_pos = !!det_col_sym + max_det * 0.06,
+      y_pos = !!det_col_sym + radial_max * 0.06,
       label = as.character(!!det_col_sym)
     )
 
@@ -167,40 +149,31 @@
 
     # --- Effort outline bars (on top) ---
     ggplot2::geom_col(
-      ggplot2::aes(y = effort_total_min * eff_scale),
+      ggplot2::aes(y = effort_total_hours),
       fill      = NA,
       color     = "black",
       width     = 1,
       linewidth = 0.4
     ) +
     ggplot2::geom_hline(
-      yintercept = det_ticks,
-      color = "grey45",
-      linewidth = 0.35
-    ) +
-    ggplot2::geom_hline(
-      yintercept = eff_ticks * eff_scale,
+      yintercept = radial_ticks,
       color = "black",
-      linetype = "dashed",
       linewidth = 0.35
     ) +
     ggplot2::geom_text(
-      data = det_grid,
+      data = radial_grid,
       ggplot2::aes(x = x_pos, y = y_pos, label = label),
-      size = 4.2,
-      hjust = -0.05,
-      color = "grey20",
-      family = "Times New Roman",
-      inherit.aes = FALSE
-    ) +
-    ggplot2::geom_text(
-      data = eff_grid,
-      ggplot2::aes(x = x_pos, y = y_pos, label = label),
-      size = 4.2,
+      size = text_size,
       hjust = 1.05,
       color = "black",
       family = "Times New Roman",
       inherit.aes = FALSE
+    ) +
+    ggplot2::annotate(
+      "text", x = 23.5, y = y_max * 0.96,
+      label = "Radial scale: hours / calls",
+      size = text_size, hjust = 1, vjust = 1,
+      color = "black", family = "Times New Roman"
     ) +
 
     # --- Detection count labels at bar tips (optional) ---
@@ -208,7 +181,7 @@
         ggplot2::geom_text(
           data        = label_data,
           ggplot2::aes(x = x_pos, y = y_pos, label = label),
-          size        = 4.2,
+          size        = text_size,
           fontface    = "bold",
           family      = "Times New Roman",
           color       = "black",
@@ -264,10 +237,8 @@
 #'                         Use "white" or any color string to add a fill.
 #' @param dawn_color       Background color for dawn/dusk twilight. Default: "#FFB6C1" (light pink).
 #' @param night_color      Background color for night. Default: "grey70".
-#' @param shared_effort_scale  Logical. If TRUE, effort bars use the same scale across
-#'                             both panels (so effort height is directly comparable).
-#'                             If FALSE (default), each panel scales effort independently
-#'                             to its own detection maximum.
+#' @param shared_effort_scale  Deprecated; effort and detections always use one shared
+#'                             radial scale.
 #' @param force_dawn       Override the suncalc-derived dawn time with a fixed decimal hour
 #'                         (e.g. force_dawn = 5.5 for 05:30). Default: NULL (use suncalc median).
 #' @param force_sunrise    Override sunrise. Default: NULL.
@@ -407,13 +378,19 @@ plot_diurnal_calls <- function(
     dplyr::group_by(hour_of_day) |>
     dplyr::summarise(
       effort_total_min = sum(effort_seg,  na.rm = TRUE),
+      effort_total_hours = effort_total_min / 60,
       be_detections    = sum(be_det,      na.rm = TRUE),
       be500_detections = sum(be500_det,   na.rm = TRUE),
       .groups = "drop"
     ) |>
     tidyr::complete(
       hour_of_day = 0:23,
-      fill = list(effort_total_min = 0, be_detections = 0, be500_detections = 0)
+      fill = list(
+        effort_total_min = 0,
+        effort_total_hours = 0,
+        be_detections = 0,
+        be500_detections = 0
+      )
     )
 
   # --- 6. Solar times for shading ---------------------------------------------
@@ -431,9 +408,12 @@ plot_diurnal_calls <- function(
     rec_tz, med_dawn, med_sunrise, med_sunset, med_dusk
   ))
 
-  # --- 7. Effort scale ---------------------------------------------------------
-  # If shared_effort_scale = TRUE, both panels use the same effort denominator
-  global_eff <- if (shared_effort_scale) max(hourly$effort_total_min, na.rm = TRUE) else NULL
+  # --- 7. Common radial scale ---------------------------------------------------
+  radial_max <- max(
+    c(hourly$effort_total_hours, hourly$be_detections, hourly$be500_detections),
+    na.rm = TRUE
+  )
+  if (!is.finite(radial_max) || radial_max <= 0) radial_max <- 1
 
   # --- 8. Build panels ---------------------------------------------------------
   time_label_interval <- if (width >= 18) 2 else if (width >= 12) 3 else 4
@@ -442,7 +422,7 @@ plot_diurnal_calls <- function(
     hourly, "be_detections", be_title, be_color,
     med_dawn, med_sunrise, med_sunset, med_dusk,
     day_color, dawn_color, night_color,
-    global_max_eff  = global_eff,
+    global_radial_max = radial_max,
     show_det_labels = show_det_labels,
     time_label_interval = time_label_interval
   )
@@ -451,7 +431,7 @@ plot_diurnal_calls <- function(
     hourly, "be500_detections", be500_title, be500_color,
     med_dawn, med_sunrise, med_sunset, med_dusk,
     day_color, dawn_color, night_color,
-    global_max_eff  = global_eff,
+    global_radial_max = radial_max,
     show_det_labels = show_det_labels,
     time_label_interval = time_label_interval
   )
