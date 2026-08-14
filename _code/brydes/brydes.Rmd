@@ -251,7 +251,6 @@ plot_diurnal_calls(
   day_color   = "white",
   dawn_color  = "#F6F6FF",
   night_color = "gray",
-  shared_effort_scale = TRUE,
   plot_title  = NULL,
   be_title    = "Bryde's Mid-Frequency Calls",
   be500_title = "Bryde's 500-Hz Calls",
