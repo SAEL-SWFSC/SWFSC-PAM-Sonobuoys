@@ -137,6 +137,20 @@
   }
 
   p <- p +
+    ggplot2::geom_hline(
+      yintercept = radial_ticks,
+      color = "grey80",
+      linewidth = 0.35
+    ) +
+    ggplot2::geom_segment(
+      data = tibble::tibble(x = 0:23),
+      ggplot2::aes(x = x, xend = x, y = 0, yend = radial_max),
+      color = "grey85",
+      linewidth = 0.3,
+      inherit.aes = FALSE
+    )
+
+  p <- p +
     # --- Detection filled bars (below effort outline) ---
     ggplot2::geom_col(
       ggplot2::aes(y = !!det_col_sym),
@@ -192,7 +206,7 @@
       axis.text.x      = ggplot2::element_text(size = 13, color = "grey20", family = "Times New Roman"),
       axis.text.y      = ggplot2::element_blank(),
       axis.ticks       = ggplot2::element_blank(),
-      panel.grid.major = ggplot2::element_line(color = "grey85", linewidth = 0.4),
+      panel.grid.major = ggplot2::element_line(color = "grey80", linewidth = 0.35),
       panel.grid.minor = ggplot2::element_blank(),
       plot.background  = ggplot2::element_rect(fill = "white", color = NA),
       panel.background = ggplot2::element_rect(fill = "white", color = NA),
