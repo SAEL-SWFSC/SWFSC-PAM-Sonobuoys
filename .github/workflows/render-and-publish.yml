@@ -25,7 +25,11 @@ jobs:
           # uncomment below and fill to pin a version
           # version: 0.9.600
       
-      # add software dependencies here
+# add software dependencies here
+      - name: Set up Git user
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Publish to GitHub Pages (and render)
         run: |
