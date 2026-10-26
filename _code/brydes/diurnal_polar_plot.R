@@ -77,8 +77,7 @@
                                dawn_color      = "#FFB6C1",
                                night_color     = "grey70",
                                global_radial_max,
-                               show_det_labels = TRUE,
-                               time_label_interval = 4) {
+                               show_det_labels = TRUE) {
 
   det_col_sym <- rlang::sym(det_col)
 
@@ -88,11 +87,11 @@
   radial_max <- max(radial_ticks, global_radial_max)
   y_max <- radial_max * 1.15
   radial_grid <- tibble::tibble(
-    x_pos = 23.5,
+    x_pos = 7.5,
     y_pos = radial_ticks,
     label = format(radial_ticks, trim = TRUE, scientific = FALSE)
   )
-  text_size <- 12 / ggplot2::.pt
+  text_size <- 14 / ggplot2::.pt
 
   # --- Assign each hour a period color -----------------------------------------
   period_colors <- sapply(0:23, function(h) {
@@ -143,7 +142,6 @@
       ggplot2::aes(y = !!det_col_sym),
       fill  = fill_color,
       color = NA,
-      alpha = 0.85,
       width = 1
     ) +
 
@@ -155,25 +153,14 @@
       width     = 1,
       linewidth = 0.4
     ) +
-    ggplot2::geom_hline(
-      yintercept = radial_ticks,
-      color = "black",
-      linewidth = 0.35
-    ) +
     ggplot2::geom_text(
       data = radial_grid,
       ggplot2::aes(x = x_pos, y = y_pos, label = label),
-      size = text_size,
-      hjust = 1.05,
+      size = 4.8,
+      hjust = 0.5,
       color = "black",
       family = "Times New Roman",
       inherit.aes = FALSE
-    ) +
-    ggplot2::annotate(
-      "text", x = 23.5, y = y_max * 0.96,
-      label = "Radial scale: hours / calls",
-      size = text_size, hjust = 1, vjust = 1,
-      color = "black", family = "Times New Roman"
     ) +
 
     # --- Detection count labels at bar tips (optional) ---
@@ -194,18 +181,18 @@
     ggplot2::coord_polar(theta = "x", start = 0, direction = 1) +
     ggplot2::scale_x_continuous(
       limits = c(0, 24),
-      breaks = seq(0, 24 - time_label_interval, by = time_label_interval),
-      labels = function(x) sprintf("%02d:00", x %% 24)
+      breaks = 0:23,
+      labels = function(x) ifelse(x == 0, "0/24", as.character(x))
     ) +
     ggplot2::scale_y_continuous(limits = c(0, y_max), expand = c(0, 0)) +
     ggplot2::labs(title = title_str, x = NULL, y = NULL) +
-    ggplot2::theme_minimal(base_size = 12, base_family = "Times New Roman") +
+    ggplot2::theme_minimal(base_size = 14, base_family = "Times New Roman") +
     ggplot2::theme(
-      plot.title       = ggplot2::element_text(face = "bold", hjust = 0.5, size = 12, family = "Times New Roman"),
-      axis.text.x      = ggplot2::element_text(size = 12, color = "grey30", family = "Times New Roman"),
+      plot.title       = ggplot2::element_text(face = "bold", hjust = 0.5, size = 17, family = "Times New Roman"),
+      axis.text.x      = ggplot2::element_text(size = 13, color = "grey20", family = "Times New Roman"),
       axis.text.y      = ggplot2::element_blank(),
       axis.ticks       = ggplot2::element_blank(),
-      panel.grid.major = ggplot2::element_line(color = "grey85", linewidth = 0.3),
+      panel.grid.major = ggplot2::element_line(color = "grey85", linewidth = 0.4),
       panel.grid.minor = ggplot2::element_blank(),
       plot.background  = ggplot2::element_rect(fill = "white", color = NA),
       panel.background = ggplot2::element_rect(fill = "white", color = NA),
@@ -416,15 +403,12 @@ plot_diurnal_calls <- function(
   if (!is.finite(radial_max) || radial_max <= 0) radial_max <- 1
 
   # --- 8. Build panels ---------------------------------------------------------
-  time_label_interval <- if (width >= 18) 2 else if (width >= 12) 3 else 4
-
   p_be <- .make_polar_panel(
     hourly, "be_detections", be_title, be_color,
     med_dawn, med_sunrise, med_sunset, med_dusk,
     day_color, dawn_color, night_color,
     global_radial_max = radial_max,
-    show_det_labels = show_det_labels,
-    time_label_interval = time_label_interval
+    show_det_labels = show_det_labels
   )
 
   p_be500 <- .make_polar_panel(
@@ -432,8 +416,7 @@ plot_diurnal_calls <- function(
     med_dawn, med_sunrise, med_sunset, med_dusk,
     day_color, dawn_color, night_color,
     global_radial_max = radial_max,
-    show_det_labels = show_det_labels,
-    time_label_interval = time_label_interval
+    show_det_labels = show_det_labels
   )
 
   # --- 9. Combine with patchwork (no caption) ----------------------------------
@@ -442,7 +425,7 @@ plot_diurnal_calls <- function(
       title = plot_title,
       theme = ggplot2::theme(
         plot.title = ggplot2::element_text(
-          face = "bold", size = 12, hjust = 0.5, family = "Times New Roman"
+          face = "bold", size = 17, hjust = 0.5, family = "Times New Roman"
         )
       )
     )
