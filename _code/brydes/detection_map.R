@@ -84,18 +84,18 @@ detection_map <- function(
     padding_deg                = 1,
     xlim                       = NULL,
     ylim                       = NULL,
-    label_sighting              = "w/ sighting",
-    label_no_sighting           = "acoustic only",
-    label_not_detected          = "No detections",
-    label_not_detected_sighting = "No detections w/ Bryde's sighting",
+    label_sighting              = "Bryde's Sighting",
+    label_no_sighting           = "No Acoustic Detection",
+    label_not_detected          = "No Bryde's Sightings, No Acousic Detections",
+    label_not_detected_sighting = "Bryde's Sighting, No Acoustic Detections",
     show_not_detected           = TRUE,
-    legend_title                = "Detection",
+    legend_title                = "Detections",
     dpi                         = 300,
     fig_width                   = 10,
     fig_height                  = 8,
     plot_margin                 = c(2, 2, 2, 2),  # top,right,bottom,left in mm
     font_family                 = "Times New Roman",
-    font_size                   = 12,
+    font_size                   = 10,
     bathy_res                   = 1,
     keep_bathy                  = TRUE
 ) {
@@ -431,13 +431,14 @@ detection_map <- function(
     theme_bw(base_size = font_size, base_family = font_family) +
     theme(
       axis.title        = element_blank(),
+      axis.text         = element_text(size = 30),
       panel.grid.major  = element_line(color = "white", linewidth = 0.3,
                                        linetype = "dashed"),
       panel.border      = element_rect(color = "black", linewidth = 0.8),
       legend.background = element_rect(fill = alpha("white", 0.8), color = "grey60"),
       legend.key        = element_blank(),
-      legend.title      = element_text(face = "bold", size = 10),
-      legend.text       = element_text(size = 9),
+      legend.title      = element_text(face = "bold", size = 40),
+      legend.text       = element_text(size = 30),
       legend.position   = "right",
       plot.margin       = margin(plot_margin[1], plot_margin[2],
                                   plot_margin[3], plot_margin[4], unit = "mm")

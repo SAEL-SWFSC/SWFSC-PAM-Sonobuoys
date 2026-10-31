@@ -3,15 +3,18 @@ library(gt)
 library(ggplot2)
 
 analyze_burst_ipi <- function(data, maxIPI,
-                              plot_histogram  = TRUE,
-                              bin_width       = NULL,
-                              show_median     = TRUE,
-                              peak_method     = c("auto", "manual", "none"),
-                              manual_peaks    = NULL,
-                              fill_by         = NULL,
-                              fill_colors     = NULL,
-                              table_path      = "ipi_summary_table.png",
-                              plot_path       = "ipi_histogram.png") {
+                              plot_histogram     = TRUE,
+                              bin_width          = NULL,
+                              show_median        = TRUE,
+                              peak_method        = c("auto", "manual", "none"),
+                              manual_peaks       = NULL,
+                              fill_by            = NULL,
+                              fill_colors        = NULL,
+                              legend_title       = "Event", # Legend title text
+                              legend_title_size  = 30,      # Legend title font size
+                              legend_text_size   = 24,      # Legend categories font size
+                              table_path         = "ipi_summary_table.png",
+                              plot_path          = "ipi_histogram.png") {
   
   peak_method <- match.arg(peak_method)
   
@@ -27,11 +30,10 @@ analyze_burst_ipi <- function(data, maxIPI,
   valid_ipi <- processed_data %>%
     filter(!is.na(IPI), IPI <= maxIPI)
   
-  
   # ── 3. Summary table (data) ────────────────────────────────────────────────
   summary_df <- processed_data %>%
     filter(!is.na(IPI)) %>%
-    mutate(IPI = round(IPI, digits= 1))%>%
+    mutate(IPI = round(IPI, digits = 1)) %>%
     group_by(sonobuoy_ID) %>%
     summarise(
       exceeded_max_count = sum(IPI > maxIPI),
@@ -97,7 +99,6 @@ analyze_burst_ipi <- function(data, maxIPI,
   
   if (plot_histogram && nrow(valid_ipi) > 0) {
     
-    # Bin width: user-supplied or Freedman-Diaconis
     bw <- if (!is.null(bin_width)) {
       bin_width
     } else {
@@ -107,10 +108,6 @@ analyze_burst_ipi <- function(data, maxIPI,
     
     overall_median <- median(valid_ipi$IPI)
     
-    # Base plot
-    # NOTE: fixed vs. mapped `fill` must never both be passed to geom_histogram()
-    # at once (passing fill = NULL alongside mapping = aes(fill = ...) crashes
-    # ggplot2's aesthetic length-check). Build the layer conditionally instead.
     hist_layer <- if (is.null(fill_by)) {
       geom_histogram(
         binwidth  = bw,
@@ -134,20 +131,37 @@ analyze_burst_ipi <- function(data, maxIPI,
         subtitle = paste0("All sonobuoys combined  |  IPI \u2264 ", maxIPI, " s  |  n = ",
                           nrow(valid_ipi)),
         x        = "IPI (s)",
-        y        = "Count"
+        y        = "Count",
+        fill     = legend_title # Maps custom legend title
       ) +
+      scale_y_continuous(expand = expansion(mult = c(0, 0.18))) + # Adds 18% headroom so raised peak labels won't clip
       theme_classic(base_size = 13, base_family = "Times New Roman") +
       theme(
-        plot.title    = element_text(face = "bold", size = 15),
-        plot.subtitle = element_text(color = "grey30", size = 11),
-        axis.title    = element_text(face = "bold"),
-        axis.text     = element_text(color = "black"),
-        axis.line     = element_line(color = "black", linewidth = 0.4),
-        panel.grid    = element_blank()
+        plot.title           = element_text(face = "bold", size = 40),
+        plot.subtitle        = element_text(color = "grey30", size = 30),
+        axis.title           = element_text(face = "bold", size = 30),
+        axis.text            = element_text(color = "black", size = 30),
+        axis.line            = element_line(color = "black", linewidth = 0.4),
+        panel.grid           = element_blank(),
+        
+        # ── Inset Legend ─────────────────────────────────────────────────────
+        legend.position      = c(0.95, 0.90),
+        legend.justification = c("right", "top"),
+        legend.background    = element_rect(fill = "white", color = "black", linewidth = 0.3),
+        
+        # ── Legend Font & Size ───────────────────────────────────────────────
+        legend.title         = element_text(family = "Times New Roman", face = "bold", size = legend_title_size),
+        legend.text          = element_text(family = "Times New Roman", size = legend_text_size),
+        legend.key.size      = unit(1.6, "lines") # Unified single sizing
       )
+    
     if (!is.null(fill_by)) {
       p <- p +
-        ggplot2::scale_fill_manual(values = fill_colors, drop = FALSE)
+        ggplot2::scale_fill_manual(
+          name   = legend_title, # Enforces custom name on manual scale
+          values = fill_colors, 
+          drop   = FALSE
+        )
     }
     
     # Median line (optional)
@@ -165,7 +179,7 @@ analyze_burst_ipi <- function(data, maxIPI,
                  vjust  = 1.5,
                  color  = "black",
                  family = "Times New Roman",
-                 size   = 4)
+                 size   = 10)
     }
     
     # Automatic peak detection
@@ -201,12 +215,17 @@ analyze_burst_ipi <- function(data, maxIPI,
                      aes(x     = x,
                          y     = y_scaled,
                          label = paste0("Peak\n", round(x, 3), " s")),
-                     color    = "black",
-                     fill     = "white",
-                     family   = "Times New Roman",
-                     size     = 3.3,
-                     nudge_x  = diff(range(valid_ipi$IPI)) * 0.02,
-                     inherit.aes = FALSE)
+                     color         = "black",
+                     fill          = "white",
+                     family        = "Times New Roman",
+                     size          = 10,
+                     vjust         = 0,                   # Anchors box by bottom edge
+                     nudge_y       = hist_max * 0.04,     # Raises box completely above the apex
+                     lineheight    = 0.35,                # Compact spacing without character collision
+                     label.padding = unit(0.12, "lines"), # Tight margins around text inside box
+                     label.r       = unit(0.15, "lines"),
+                     nudge_x       = 0,                   # Centered directly over peak
+                     inherit.aes   = FALSE)
         
         message(length(peaks$x), " auto-detected peak(s) at IPI = ",
                 paste(round(peaks$x, 4), collapse = ", "), " s")
@@ -215,7 +234,7 @@ analyze_burst_ipi <- function(data, maxIPI,
       }
     }
     
-    # Manual peak annotation
+    # Manual peak detection
     if (peak_method == "manual" && !is.null(manual_peaks)) {
       manual_df <- data.frame(x = manual_peaks)
       p <- p +
@@ -228,12 +247,14 @@ analyze_burst_ipi <- function(data, maxIPI,
                    aes(x     = x,
                        y     = Inf,
                        label = paste0("Peak\n", round(x, 3), " s")),
-                   color   = "black",
-                   fill    = "white",
-                   family  = "Times New Roman",
-                   size    = 3.3,
-                   vjust   = 1.5,
-                   inherit.aes = FALSE)
+                   color         = "black",
+                   fill          = "white",
+                   family        = "Times New Roman",
+                   size          = 10,
+                   vjust         = 1.1,
+                   lineheight    = 0.75,
+                   label.padding = unit(0.12, "lines"),
+                   inherit.aes   = FALSE)
     }
     
     ggsave(plot_path, plot = p, width = 8, height = 5, dpi = 300)
@@ -245,4 +266,3 @@ analyze_burst_ipi <- function(data, maxIPI,
   
   return(summary_df)
 }
-

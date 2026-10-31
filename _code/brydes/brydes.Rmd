@@ -86,8 +86,9 @@ if (nrow(unmatched) > 0) {
 
 ``` {r testTime}
 source(here("_code/brydes/compare_dates.R"))
+survey_data <- read_csv(here("data/surveyData.csv"))
 result <- compare_dates(deploy, survey_data)
-result
+!result
 
 ```
 #OffsetGMT
@@ -164,7 +165,7 @@ detection_map(
 # IPI Histogram
 
 ```{r ipiHist}
-source(here::here("_code/brydes/analyze_burst_ipi.R"))
+#source(here::here("_code/brydes/analyze_burst_ipi.R"))
 be500 <- raven %>%
   filter(be500 == "Y") %>%
   mutate(
@@ -176,17 +177,27 @@ be500 <- raven %>%
     )
   )
 # Auto peak detection (default)
-ipi_result <- analyze_burst_ipi(be500, maxIPI = 60.0, bin_width = 1, show_median = FALSE, 
-                            fill_by = "event",
-                            fill_colors = c(
-                              "1621-3" = "#cadceb",
-                              "1621-8,9" = "#dbf1d7",
-                              "1629-4,5" = "#e8dbec",
-                              "Other" = "grey75"
-                            ),
-                            table_path = here("output/brydes/brydes_ipi_summary_table.docx"),
-                            plot_path = here("output/brydes/brydes_ipi_histogram.png"))
+ipi_result <- analyze_burst_ipi(
+  be500, 
+  maxIPI            = 60.0, 
+  bin_width         = 1, 
+  show_median       = FALSE, 
+  fill_by           = "event",
+  fill_colors       = c(
+    "1621-3"   = "#cadceb",
+    "1621-8,9" = "#dbf1d7",
+    "1629-4,5" = "#e8dbec",
+    "Other"    = "grey75"
+  ),
+  legend_title      = "Deployment Event", # Custom title name
+  legend_title_size = 30,                 # Title font size
+  legend_text_size  = 24,                 # Category labels font size
+  table_path        = here("output/brydes/brydes_ipi_summary_table.docx"),
+  plot_path         = here("output/brydes/brydes_ipi_histogram.png")
+)
+
 ipi_result
+
 
 
 ```
@@ -213,6 +224,7 @@ be500 %>%
 #Plot Detection Values
 
 ```{r be500}
+source(here::here("_code/brydes/_brydesCommonR.R"))
 be500 <- raven%>%
   filter(be500 == "Y")
 be500_plot <- create_acoustic_violin_plots(be500)
@@ -224,7 +236,7 @@ ggplot2::ggsave(
   width = 10,       # Width in inches
   height = 6,       # Height in inches
   dpi = 300,        # Standard academic publication resolution
-  bg = "white"      # Explicitly keeps background white (prevents transparent artifacts)
+  bg = "white"      # Explicitly keeps background white (prevents transparent artifacts), 
 )
 
 

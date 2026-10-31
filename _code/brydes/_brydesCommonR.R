@@ -25,6 +25,18 @@ library(extrafont)
 # font_import(pattern = "Times")  # one-time, slow
 # loadfonts(device = "win")  # or "pdf"/"postscript" depending on OS
 
+# 1. Install and load the packages
+if(!require(showtext)) install.packages("showtext")
+library(showtext)
+
+# 2. Tell R to automatically handle system fonts
+showtext_auto()
+
+# 3. Add Times New Roman from your Windows font folder
+# "Times New Roman" is the name you use in ggplot, "times.ttf" is the Windows file name
+font_add("Times New Roman", regular = "times.ttf", 
+         bold = "timesbd.ttf", italic = "timesi.ttf", bolditalic = "timesbi.ttf")
+
 # Source Other Files
 source(here::here("_code/brydes/diurnal_polar_plot.R"))
 
@@ -992,7 +1004,17 @@ merge_and_validate_deployments <- function(deploy_df, effort_df, be_review_df) {
 ########################
 # Acoustic Violin Plot #
 ########################
-create_acoustic_violin_plots <- function(data, hjust = -0.15, vjust = -0.5) {
+create_acoustic_violin_plots <- function(
+    data, 
+    hjust = -0.15, 
+    vjust = -0.5,
+    font_family      = "Times New Roman",
+    strip_text_size  = 45, # Facet strip headers
+    axis_title_size  = 40, # X and Y axis titles
+    axis_text_size   = 35, # X and Y tick labels
+    freq_label_size  = 15,  # geom_text size for frequency medians
+    dur_label_size   = 15   # geom_text size for duration peaks
+) {
   
   # 1. Clean, rename, and structure the long-format data variables
   plot_data <- data %>%
@@ -1004,17 +1026,16 @@ create_acoustic_violin_plots <- function(data, hjust = -0.15, vjust = -0.5) {
     ) %>%
     dplyr::mutate(metric = dplyr::recode_factor(
       metric,
-      "low_freq_hz"       = "Low Frequency (Hz)",
-      "high_freq_hz"      = "High Frequency (Hz)",
+      "low_freq_hz"       = "Minimum Frequency (Hz)",
+      "high_freq_hz"      = "Maximum Frequency (Hz)",
       "dur_90_percent_s"  = "Duration (s)"
     ))
   
-  # 2. Compute the exact medians dynamically per metric for geom_text
+  # 2. Compute exact medians dynamically per metric for geom_text
   median_labels <- plot_data %>%
     dplyr::group_by(metric) %>%
     dplyr::summarise(
       median_val = median(value, na.rm = TRUE),
-      # FIX: Extracting the scalar character explicitly forces a size of 1
       label_text = case_when(
         as.character(metric[1]) == "Duration (s)" ~ format(round(median_val, 2), nsmall = 2), 
         TRUE                                      ~ format(round(median_val, 0), nsmall = 0)
@@ -1022,8 +1043,8 @@ create_acoustic_violin_plots <- function(data, hjust = -0.15, vjust = -0.5) {
     )
   
   # 3. Split dataset and labels for Frequencies vs. Duration
-  freq_data   <- plot_data %>% dplyr::filter(metric %in% c("Low Frequency (Hz)", "High Frequency (Hz)"))
-  freq_labels <- median_labels %>% dplyr::filter(metric %in% c("Low Frequency (Hz)", "High Frequency (Hz)"))
+  freq_data   <- plot_data %>% dplyr::filter(metric %in% c("Minimum Frequency (Hz)", "Maximum Frequency (Hz)"))
+  freq_labels <- median_labels %>% dplyr::filter(metric %in% c("Minimum Frequency (Hz)", "Maximum Frequency (Hz)"))
   
   dur_data <- plot_data %>% dplyr::filter(metric == "Duration (s)")
   dur_density <- stats::density(dur_data$value[is.finite(dur_data$value)])
@@ -1040,27 +1061,29 @@ create_acoustic_violin_plots <- function(data, hjust = -0.15, vjust = -0.5) {
     )
   
   # 4. Shared theme settings
-  shared_theme <- theme_minimal(base_size = 13) +
+  shared_theme <- theme_minimal() +
     theme(
-      legend.position = "none",
-      axis.title.x = element_blank(),
-      axis.text.x = element_blank(),
-      axis.ticks.x = element_blank(),
+      legend.position   = "none",
       panel.grid.major.x = element_blank(),
-      strip.text = element_text(family = "serif", face = "bold", size = 11)
+      strip.text        = element_text(family = font_family, face = "bold", size = strip_text_size),
+      axis.title        = element_text(family = font_family, face = "bold", size = axis_title_size),
+      axis.text         = element_text(family = font_family, size = axis_text_size),
+      axis.title.x      = element_blank(),
+      axis.text.x       = element_blank(),
+      axis.ticks.x      = element_blank()
     )
   
   # 5. Build Frequency Component
   p_freq <- ggplot(freq_data, aes(x = metric, y = value, fill = metric)) +
-    geom_violin(alpha = 0.7, color = "black", linewidth = 0.5, quantiles = 0.5, quantile.linetype = "solid") +
+    geom_violin(alpha = 0.7, color = "black", linewidth = 0.5, quantiles = 0.5, quantile.linetype = "dotted") +
     geom_text(
       data = freq_labels,
       aes(x = metric, y = median_val, label = label_text),
       inherit.aes = FALSE, 
-      family = "serif",
+      family = font_family,
       fontface = "bold",
-      size = 3.5,
-      hjust = hjust,    
+      size = freq_label_size,  # Controlled here
+      hjust = 0.5,  
       vjust = vjust     
     ) +
     scale_fill_manual(values = c("#B3CDE3", "#CCEBC5")) + 
@@ -1075,33 +1098,35 @@ create_acoustic_violin_plots <- function(data, hjust = -0.15, vjust = -0.5) {
       data = dur_peaks,
       aes(xintercept = peak_val),
       inherit.aes = FALSE,
-      linewidth = 0.5
+      linewidth = 0.5,
+      linetype = "dotted"
     ) +
     geom_text(
       data = dur_peaks,
       aes(x = peak_val, y = metric, label = label_text),
-      inherit.aes = FALSE,
-      family = "serif",
+      inherit.aes = FALSE, 
+      family = font_family,
       fontface = "bold",
-      size = 3.5,
-      vjust = -1
+      size = dur_label_size,  # Controlled here
+      vjust = -0.5,
+      hjust = 1.1
     ) +
     scale_fill_manual(values = c("#DECBE4")) + 
     facet_wrap(~ metric) + 
     labs(x = "Duration (seconds)", y = NULL) +
     shared_theme +
     theme(
-      axis.title.x = element_text(),
-      axis.text.x = element_text(),
+      # Re-enable bottom X-axis title and text with font parameters preserved
+      axis.title.x = element_text(family = font_family, face = "bold", size = axis_title_size),
+      axis.text.x  = element_text(family = font_family, size = axis_text_size),
       axis.ticks.x = element_line(),
-      axis.text.y = element_blank(),
+      axis.text.y  = element_blank(),
       axis.ticks.y = element_blank()
     )
   
   # 7. Layout composition
   combined_plot <- (p_freq / p_dur) +
     plot_layout(heights = c(2, 1))
-    # plot_annotation(title = "Distribution of Acoustic Features")
   
   return(combined_plot)
 }

@@ -170,7 +170,7 @@
     ggplot2::geom_text(
       data = radial_grid,
       ggplot2::aes(x = x_pos, y = y_pos, label = label),
-      size = 4.8,
+      size = 16,
       hjust = 0.5,
       color = "black",
       family = "Times New Roman",
@@ -200,10 +200,10 @@
     ) +
     ggplot2::scale_y_continuous(limits = c(0, y_max), expand = c(0, 0)) +
     ggplot2::labs(title = title_str, x = NULL, y = NULL) +
-    ggplot2::theme_minimal(base_size = 14, base_family = "Times New Roman") +
+    ggplot2::theme_minimal(base_size = 20, base_family = "Times New Roman") +
     ggplot2::theme(
-      plot.title       = ggplot2::element_text(face = "bold", hjust = 0.5, size = 17, family = "Times New Roman"),
-      axis.text.x      = ggplot2::element_text(size = 13, color = "grey20", family = "Times New Roman"),
+      plot.title       = ggplot2::element_text(face = "bold", hjust = 0.5, size = 50, family = "Times New Roman"),
+      axis.text.x      = ggplot2::element_text(size = 40, color = "grey20", family = "Times New Roman"),
       axis.text.y      = ggplot2::element_blank(),
       axis.ticks       = ggplot2::element_blank(),
       panel.grid.major = ggplot2::element_line(color = "grey80", linewidth = 0.35),
